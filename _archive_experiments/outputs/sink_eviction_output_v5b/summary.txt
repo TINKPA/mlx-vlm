@@ -1,0 +1,53 @@
+Sink-Aware KV Cache Eviction — Systematic Evaluation
+============================================================
+
+Model: mlx-community/Qwen2.5-VL-7B-Instruct-8bit
+Video: test_video.mp4
+Visual: 250 tokens (sink=231)
+Prompts: 5
+Budgets: [0.04, 0.08, 0.12, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0]
+
+AGGREGATED ROUGE-L:
+Budget   Sink-Aware (ours)    Reverse-Sink         Uniform Oldest       Random              
+------------------------------------------------------------------------------------------
+4%       0.472                0.430                0.461                0.449               
+8%       0.481                0.462                0.478                0.509               
+12%      0.481                0.485                0.526                0.543               
+20%      0.497                0.544                0.511                0.552               
+30%      0.528                0.514                0.516                0.550               
+40%      0.605                0.523                0.554                0.537               
+50%      0.594                0.546                0.495                0.659               
+60%      0.564                0.582                0.556                0.591               
+80%      0.538                0.561                0.573                0.544               
+100%     1.000                1.000                1.000                1.000               
+
+
+PER-PROMPT BASELINES:
+
+  Q1: Describe the butterfly in this video.
+  A: The butterfly in the video is pink with translucent wings. It appears to be a small, delicate butter
+
+  Q2: What color are the butterfly's wings?
+  A: The butterfly's wings are pink.
+
+  Q3: What is the background scenery?
+  A: The background scenery in the image features a lush, green landscape with rolling hills, scattered t
+
+  Q4: Describe all characters in this video.
+  A: The video features an animated character, a large, white, anthropomorphic rabbit with a bow tie. The
+
+  Q5: Is the butterfly on the left or right side of the screen?
+  A: The butterfly is on the left side of the screen.
+
+
+BEST STRATEGY PER BUDGET:
+  4%: Sink-Aware (ours) (RL=0.472)
+  8%: Random (RL=0.509)
+  12%: Random (RL=0.543)
+  20%: Random (RL=0.552)
+  30%: Random (RL=0.550)
+  40%: Sink-Aware (ours) (RL=0.605)
+  50%: Random (RL=0.659)
+  60%: Random (RL=0.591)
+  80%: Uniform Oldest (RL=0.573)
+  100%: Sink-Aware (ours) (RL=1.000)
