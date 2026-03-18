@@ -1,0 +1,220 @@
+{
+  "videos": [
+    {
+      "name": "butterfly",
+      "n_vis": 250,
+      "n_sink": 231
+    },
+    {
+      "name": "red_car",
+      "n_vis": 108,
+      "n_sink": 103
+    },
+    {
+      "name": "blue_bounce",
+      "n_vis": 108,
+      "n_sink": 108
+    },
+    {
+      "name": "color_change",
+      "n_vis": 108,
+      "n_sink": 108
+    },
+    {
+      "name": "countdown",
+      "n_vis": 108,
+      "n_sink": 100
+    },
+    {
+      "name": "split_color",
+      "n_vis": 108,
+      "n_sink": 108
+    }
+  ],
+  "budgets": [
+    0.08,
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1.0
+  ],
+  "aggregated": {
+    "sink_aware": [
+      {
+        "budget": 0.08,
+        "rougeL_mean": 0.5022699902126947,
+        "rougeL_std": 0.1948885517505743,
+        "rouge1_mean": 0.5763160660144693,
+        "n": 15
+      },
+      {
+        "budget": 0.2,
+        "rougeL_mean": 0.4927705872809012,
+        "rougeL_std": 0.17589591176429661,
+        "rouge1_mean": 0.5830508389230732,
+        "n": 15
+      },
+      {
+        "budget": 0.4,
+        "rougeL_mean": 0.5215048951595805,
+        "rougeL_std": 0.15528514143872596,
+        "rouge1_mean": 0.5898775191432889,
+        "n": 15
+      },
+      {
+        "budget": 0.6,
+        "rougeL_mean": 0.4571096502840645,
+        "rougeL_std": 0.190128145450081,
+        "rouge1_mean": 0.5145066247145034,
+        "n": 15
+      },
+      {
+        "budget": 0.8,
+        "rougeL_mean": 0.40464064001124717,
+        "rougeL_std": 0.20511827685861375,
+        "rouge1_mean": 0.4309178128071341,
+        "n": 15
+      },
+      {
+        "budget": 1.0,
+        "rougeL_mean": 1.0,
+        "rougeL_std": 0.0,
+        "rouge1_mean": 1.0,
+        "n": 15
+      }
+    ],
+    "reverse_sink": [
+      {
+        "budget": 0.08,
+        "rougeL_mean": 0.4552066795401208,
+        "rougeL_std": 0.20010905058472483,
+        "rouge1_mean": 0.5618678670451227,
+        "n": 15
+      },
+      {
+        "budget": 0.2,
+        "rougeL_mean": 0.5196555631315455,
+        "rougeL_std": 0.20025909534219977,
+        "rouge1_mean": 0.6083306602278501,
+        "n": 15
+      },
+      {
+        "budget": 0.4,
+        "rougeL_mean": 0.4815150625925947,
+        "rougeL_std": 0.19320854464701004,
+        "rouge1_mean": 0.568379759660027,
+        "n": 15
+      },
+      {
+        "budget": 0.6,
+        "rougeL_mean": 0.4457893894837097,
+        "rougeL_std": 0.15920189820977285,
+        "rouge1_mean": 0.5115394598789084,
+        "n": 15
+      },
+      {
+        "budget": 0.8,
+        "rougeL_mean": 0.4235238370348475,
+        "rougeL_std": 0.20722006981269642,
+        "rouge1_mean": 0.47048964046805847,
+        "n": 15
+      },
+      {
+        "budget": 1.0,
+        "rougeL_mean": 1.0,
+        "rougeL_std": 0.0,
+        "rouge1_mean": 1.0,
+        "n": 15
+      }
+    ],
+    "uniform": [
+      {
+        "budget": 0.08,
+        "rougeL_mean": 0.48038838682482765,
+        "rougeL_std": 0.19251760921855365,
+        "rouge1_mean": 0.5603668236238952,
+        "n": 15
+      },
+      {
+        "budget": 0.2,
+        "rougeL_mean": 0.510928476741707,
+        "rougeL_std": 0.22152885254416266,
+        "rouge1_mean": 0.6106103125662123,
+        "n": 15
+      },
+      {
+        "budget": 0.4,
+        "rougeL_mean": 0.45332604927472,
+        "rougeL_std": 0.18772139375583338,
+        "rouge1_mean": 0.5322973108523302,
+        "n": 15
+      },
+      {
+        "budget": 0.6,
+        "rougeL_mean": 0.41765553457413807,
+        "rougeL_std": 0.12771466303576756,
+        "rouge1_mean": 0.5085922406221277,
+        "n": 15
+      },
+      {
+        "budget": 0.8,
+        "rougeL_mean": 0.43213542762883905,
+        "rougeL_std": 0.21740685194627837,
+        "rouge1_mean": 0.4925846727469306,
+        "n": 15
+      },
+      {
+        "budget": 1.0,
+        "rougeL_mean": 1.0,
+        "rougeL_std": 0.0,
+        "rouge1_mean": 1.0,
+        "n": 15
+      }
+    ],
+    "random": [
+      {
+        "budget": 0.08,
+        "rougeL_mean": 0.4773686804994473,
+        "rougeL_std": 0.19350900907007454,
+        "rouge1_mean": 0.5843185707236704,
+        "n": 15
+      },
+      {
+        "budget": 0.2,
+        "rougeL_mean": 0.468305625298226,
+        "rougeL_std": 0.14208614868807976,
+        "rouge1_mean": 0.5367737367015741,
+        "n": 15
+      },
+      {
+        "budget": 0.4,
+        "rougeL_mean": 0.4636030007623016,
+        "rougeL_std": 0.16264691804575362,
+        "rouge1_mean": 0.5558991066853977,
+        "n": 15
+      },
+      {
+        "budget": 0.6,
+        "rougeL_mean": 0.4183705809657052,
+        "rougeL_std": 0.17620086685772818,
+        "rouge1_mean": 0.48774475758194996,
+        "n": 15
+      },
+      {
+        "budget": 0.8,
+        "rougeL_mean": 0.4141184891057606,
+        "rougeL_std": 0.19600496255143965,
+        "rouge1_mean": 0.45519275138663307,
+        "n": 15
+      },
+      {
+        "budget": 1.0,
+        "rougeL_mean": 1.0,
+        "rougeL_std": 0.0,
+        "rouge1_mean": 1.0,
+        "n": 15
+      }
+    ]
+  }
+}

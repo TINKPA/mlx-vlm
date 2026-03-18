@@ -1,0 +1,125 @@
+Sink Eviction v5 — True KV Cache Eviction
+============================================================
+
+Model: mlx-community/Qwen2.5-VL-7B-Instruct-8bit
+Video: test_video.mp4
+Prompt: Describe the butterfly in this video.
+Visual: 250 (sink=231, non=19)
+Detection: L14, tau=20
+Method: True KV cache eviction (entries removed)
+
+Baseline:
+The butterfly in the video is pink with translucent wings. It appears to be a small, delicate butterfly, possibly a species of butterfly that is commonly found in gardens or open fields. The butterfly is seen flying around the animated character, which is a large, white, anthropomorphic rabbit. The butterfly seems to be interacting with the rabbit, possibly landing on it or flying close by. The background of the video is a bright, sunny day with a clear blue sky and green grass, which suggests that the
+
+
+========================================
+Strategy: Sink-Aware (ours)
+========================================
+
+  Budget 8% (keep=20, evict=230)
+  sim=0.20 OK
+  The image you've provided doesn't contain a butterfly. Instead, it shows a dog in a playful pose on a grassy field. The 
+
+  Budget 20% (keep=50, evict=200)
+  sim=0.23 OK
+  The butterfly in the video is a small, delicate creature with wings that are a mix of light and dark colors, possibly fe
+
+  Budget 40% (keep=100, evict=150)
+  sim=0.39 OK
+  The butterfly in the video is a pink butterfly with delicate wings. It appears to be fluttering around the animated char
+
+  Budget 60% (keep=150, evict=100)
+  sim=0.28 OK
+  The butterfly in the video is a pink and purple butterfly with a delicate, translucent appearance. It is seen fluttering
+
+  Budget 80% (keep=200, evict=50)
+  sim=0.23 OK
+  The butterfly in the video is a pink and purple butterfly with translucent wings. It is flying over a white, fluffy crea
+
+  Budget 100% (keep=250, evict=0)
+  sim=1.00 OK
+  The butterfly in the video is pink with translucent wings. It appears to be a small, delicate butterfly, possibly a spec
+
+========================================
+Strategy: Reverse-Sink
+========================================
+
+  Budget 8% (keep=20, evict=230)
+  sim=0.19 OK
+  The image you've provided doesn't contain a butterfly. Instead, it shows a white rabbit with large, expressive eyes and 
+
+  Budget 20% (keep=50, evict=200)
+  sim=0.29 OK
+  The butterfly in the video is a small, delicate creature with wings that appear to be a light, translucent pink or laven
+
+  Budget 40% (keep=100, evict=150)
+  sim=0.16 OK
+  The butterfly in the video is a pink and purple butterfly with a delicate, translucent appearance. It has a slender body
+
+  Budget 60% (keep=150, evict=100)
+  sim=0.25 OK
+  The butterfly in the video is a pink and purple butterfly with translucent wings. It is flying over a grassy field and a
+
+  Budget 80% (keep=200, evict=50)
+  sim=0.34 OK
+  The butterfly in the video is pink with translucent wings. It appears to be a small, delicate butterfly, possibly a spec
+
+  Budget 100% (keep=250, evict=0)
+  sim=1.00 OK
+  The butterfly in the video is pink with translucent wings. It appears to be a small, delicate butterfly, possibly a spec
+
+========================================
+Strategy: Uniform Oldest
+========================================
+
+  Budget 8% (keep=20, evict=230)
+  sim=0.18 OK
+  The image you've provided doesn't contain a butterfly. Instead, it shows a cartoon-style character, which appears to be 
+
+  Budget 20% (keep=50, evict=200)
+  sim=0.28 OK
+  The butterfly in the video is a small, delicate creature with wings that appear to be a light, possibly iridescent color
+
+  Budget 40% (keep=100, evict=150)
+  sim=0.29 OK
+  The butterfly in the video is a small, delicate creature with wings that are a mix of light and dark colors, possibly in
+
+  Budget 60% (keep=150, evict=100)
+  sim=0.25 OK
+  The butterfly in the video is a small, delicate creature with wings that are a mix of light and dark colors, possibly in
+
+  Budget 80% (keep=200, evict=50)
+  sim=0.29 OK
+  The butterfly in the video is a pink and purple butterfly with translucent wings. It is flying around the large, white, 
+
+  Budget 100% (keep=250, evict=0)
+  sim=1.00 OK
+  The butterfly in the video is pink with translucent wings. It appears to be a small, delicate butterfly, possibly a spec
+
+========================================
+Strategy: Random
+========================================
+
+  Budget 8% (keep=20, evict=230)
+  sim=0.22 OK
+  The image you've provided is a still frame from an animated scene. It features a white, round character with a smiling f
+
+  Budget 20% (keep=50, evict=200)
+  sim=0.30 OK
+  The butterfly in the video is a small, delicate creature with wings that appear to be a soft, pastel shade of pink or la
+
+  Budget 40% (keep=100, evict=150)
+  sim=0.30 OK
+  The butterfly in the video is a small, delicate creature with wings that appear to be a soft, pastel shade of pink or la
+
+  Budget 60% (keep=150, evict=100)
+  sim=0.19 OK
+  The butterfly in the video is a large, colorful butterfly with wings that are a mix of pink, purple, and blue hues. It h
+
+  Budget 80% (keep=200, evict=50)
+  sim=0.23 OK
+  The butterfly in the video is a pink and purple butterfly with translucent wings. It is flying around a white rabbit cha
+
+  Budget 100% (keep=250, evict=0)
+  sim=1.00 OK
+  The butterfly in the video is pink with translucent wings. It appears to be a small, delicate butterfly, possibly a spec

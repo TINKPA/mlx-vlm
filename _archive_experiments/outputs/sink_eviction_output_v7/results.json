@@ -1,0 +1,2651 @@
+{
+  "baseline_acc": 0.7,
+  "n_questions": 10,
+  "budgets": [
+    0.1,
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1.0
+  ],
+  "accuracy": {
+    "combined": {
+      "0.1": 0.7,
+      "0.2": 0.7,
+      "0.4": 0.7,
+      "0.6": 0.7,
+      "0.8": 0.7
+    },
+    "attn": {
+      "0.1": 0.7,
+      "0.2": 0.7,
+      "0.4": 0.7,
+      "0.6": 0.7,
+      "0.8": 0.7
+    },
+    "phi": {
+      "0.1": 0.7,
+      "0.2": 0.7,
+      "0.4": 0.7,
+      "0.6": 0.7,
+      "0.8": 0.7
+    },
+    "uniform": {
+      "0.1": 0.7,
+      "0.2": 0.7,
+      "0.4": 0.7,
+      "0.6": 0.7,
+      "0.8": 0.7
+    },
+    "random": {
+      "0.1": 0.7,
+      "0.2": 0.7,
+      "0.4": 0.7,
+      "0.6": 0.7,
+      "0.8": 0.7
+    }
+  },
+  "details": [
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 0,
+      "question": "What is the main color of the butterfly's wings in this video?",
+      "gt": "B",
+      "strategy": "none",
+      "budget": 1.0,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 1,
+      "question": "What other character appears alongside the butterfly?",
+      "gt": "C",
+      "strategy": "none",
+      "budget": 1.0,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 2,
+      "question": "What is the dominant color of the background scenery?",
+      "gt": "C",
+      "strategy": "none",
+      "budget": 1.0,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 3,
+      "question": "What style is this video rendered in?",
+      "gt": "B",
+      "strategy": "none",
+      "budget": 1.0,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 4,
+      "question": "What is the butterfly doing in the video?",
+      "gt": "B",
+      "strategy": "none",
+      "budget": 1.0,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 5,
+      "question": "What color is the moving object in this video?",
+      "gt": "C",
+      "strategy": "none",
+      "budget": 1.0,
+      "pred": "C",
+      "output": "C",
+      "correct": true
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.1,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.2,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.4,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.6,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.8,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 6,
+      "question": "What is the background color of the video?",
+      "gt": "B",
+      "strategy": "none",
+      "budget": 1.0,
+      "pred": "C",
+      "output": "C",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.1,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.1,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.1,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.1,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.1,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.2,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.2,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.2,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.2,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.2,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.4,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.4,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.4,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.4,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.4,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.6,
+      "pred": "A",
+      "output": "A main object",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.6,
+      "pred": "A",
+      "output": "A main object",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.6,
+      "pred": "A",
+      "output": "A main object",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.6,
+      "pred": "A",
+      "output": "A main object",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.6,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "combined",
+      "budget": 0.8,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "attn",
+      "budget": 0.8,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "phi",
+      "budget": 0.8,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "uniform",
+      "budget": 0.8,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "random",
+      "budget": 0.8,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 7,
+      "question": "What shape is the main object in this video?",
+      "gt": "C",
+      "strategy": "none",
+      "budget": 1.0,
+      "pred": "A",
+      "output": "A",
+      "correct": false
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.1,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.2,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.4,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.6,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.8,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 8,
+      "question": "What color is the bouncing object?",
+      "gt": "B",
+      "strategy": "none",
+      "budget": 1.0,
+      "pred": "B",
+      "output": "B",
+      "correct": true
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.1,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.1,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.1,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.1,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.1,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.2,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.2,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.2,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.2,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.2,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.4,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.4,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.4,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.4,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.4,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.6,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.6,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.6,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.6,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.6,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "combined",
+      "budget": 0.8,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "attn",
+      "budget": 0.8,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "phi",
+      "budget": 0.8,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "uniform",
+      "budget": 0.8,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "random",
+      "budget": 0.8,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    },
+    {
+      "qi": 9,
+      "question": "What happens in this video?",
+      "gt": "B",
+      "strategy": "none",
+      "budget": 1.0,
+      "pred": "D",
+      "output": "D",
+      "correct": false
+    }
+  ]
+}

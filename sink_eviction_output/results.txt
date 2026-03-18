@@ -1,0 +1,24 @@
+Sink-Aware Token Eviction POC
+============================================================
+
+Model: mlx-community/Qwen2.5-VL-7B-Instruct-8bit
+Video: test_video.mp4
+Prompt: Describe the butterfly in this video.
+Visual tokens: 250 (sink=231, non-sink=19)
+Detection: layer 14, τ=20, dims=[458, 2570]
+
+--- Baseline ---
+The butterfly in the video is pink with translucent wings. It appears to be a small, delicate butterfly, possibly a species of butterfly that is commonly found in gardens or open fields. The butterfly is seen flying around the animated character, which is a large, white, anthropomorphic rabbit. The butterfly seems to be interacting with the rabbit, possibly landing on it or flying close by. The background of the video is a bright, sunny day with a clear blue sky and green grass, which suggests that the
+
+--- Drop 231 SINK tokens ---
+The butterfly in the video is animated and has a vibrant pink color with translucent wings. It appears to be fluttering around the character, which is a large, white, anthropomorphic rabbit. The butterfly's wings are spread wide, and it seems to be interacting playfully with the rabbit, possibly as part of a whimsical or magical scene. The background is a lush, green landscape with trees and flowers, suggesting a serene and natural setting.
+
+--- Drop 19 NON-SINK tokens ---
+The butterfly in the video is pink with translucent wings. It appears to be a small, delicate butterfly, possibly a species of butterfly that is commonly found in gardens or open fields. The butterfly is seen flying around a white rabbit in a grassy field, adding a whimsical and magical element to the scene.
+
+--- Random drop 231 tokens ---
+The butterfly in the video is animated and has a soft, pastel color palette. It has delicate, translucent wings with a gradient of colors, primarily shades of pink and purple, which give it a dreamy and ethereal appearance. The butterfly's body is small and slender, with a slender antennae that it uses to navigate the air. The animation style is smooth and fluid, capturing the gentle movement of the butterfly as it flutters through the scene. The butterfly's design is simple yet elegant
+
+--- Drop ALL 250 visual tokens ---
+The butterfly in the video is animated and has a whimsical appearance. It has translucent wings with a gradient of colors, primarily shades of pink and purple, which give it a delicate and ethereal look. The butterfly is seen fluttering around a white, fluffy creature that resembles a rabbit, adding a magical and playful element to the scene. The background is a lush, green landscape with trees and flowers, enhancing the overall serene and enchanting atmosphere of the video.
+

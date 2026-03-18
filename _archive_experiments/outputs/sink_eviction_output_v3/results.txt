@@ -1,0 +1,179 @@
+Sink Eviction POC v3 — Deep Analysis
+============================================================
+
+EXP 1: Graduated Eviction
+----------------------------------------
+Keep   0: sim=0.01 OK
+  b
+c
+d
+e
+f
+g
+h
+i
+k
+l
+n
+o
+p
+q
+r
+t
+u
+v
+w
+y
+z
+A
+C
+D
+F
+H
+I
+J
+K
+L
+M
+N
+O
+P
+Q
+R
+S
+T
+U
+V
+
+
+Keep   5: sim=0.00 BROKEN
+  I'm
+
+
+Keep  10: sim=0.04 BROKEN
+  butterfly in flight
+
+Keep  20: sim=0.16 OK
+  The image shows a butterfly in flight. The butterfly has a light brown body with
+
+Keep  50: sim=0.00 BROKEN
+  <|im_start|>
+
+Keep 100: sim=0.30 OK
+  The butterfly in the video is pink with a white body and wings. It appears to be
+
+Keep 150: sim=0.30 OK
+  The butterfly in the video is a vibrant pink with delicate wings, fluttering gra
+
+Keep 200: sim=0.27 OK
+  The butterfly in the video is a pink and purple butterfly with a delicate, trans
+
+Keep 250: sim=1.00 OK
+  The butterfly in the video is pink with translucent wings. It appears to be a sm
+
+
+EXP 2: Multi-Prompt
+----------------------------------------
+
+Q: Describe the butterfly in this video.
+Baseline: The butterfly in the video is pink with translucent wings. It appears to be a sm
+Drop sink (sim=0.02): be
+下去
+的
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔
+兔子视频
+兔子
+兔子
+兔子
+兔子
+兔子
+兔子
+兔子
+兔子
+Drop non-sink (sim=0.37): The butterfly in the video is pink with purple wings. It is seen flying around a
+
+Q: What color are the butterfly's wings?
+Baseline: The butterfly's wings are pink.
+Drop sink (sim=0.00): be
+what
+Drop non-sink (sim=0.36): The butterfly's wings are pink with a hint of purple.
+
+Q: What is the background scenery in this video?
+Baseline: The background scenery in the video features a lush, green landscape with rollin
+Drop sink (sim=0.00): an
+cbdddfgyaagfgeccJORLQDFbfngrlxiopdsajefbapm
+
+Drop non-sink (sim=0.77): The background scenery in the video features a lush, green landscape with rollin
+
+Q: How many characters are in this video?
+Baseline: There is one character in the video. It is a white animated rabbit with pink win
+Drop sink (sim=0.06): a
+anassistant
+a
+anassistant
+a
+anassistant
+a
+anassistant
+a
+anassistant
+a
+anassist
+Drop non-sink (sim=0.47): There is one character in the video.
+
+Q: Is the butterfly on the left or right side?
+Baseline: The butterfly is on the left side of the image.
+Drop sink (sim=0.14): be
+the
+th
+ouncer
+o
+a
+of
+sight
+of
+the
+the
+team
+a
+a
+of
+on
+the
+shop
+a
+a
+the
+sheet
+t
+Drop non-sink (sim=1.00): The butterfly is on the left side of the image.
+
+
+EXP 3: Detection Layer
+----------------------------------------
+L 5: sink=189 drop_sink_sim=0.00 drop_nonsink_sim=0.27
+L10: sink=219 drop_sink_sim=0.00 drop_nonsink_sim=0.30
+L14: sink=231 drop_sink_sim=0.02 drop_nonsink_sim=0.37
+L20: sink=246 drop_sink_sim=0.00 drop_nonsink_sim=0.63
+L25: sink=249 drop_sink_sim=0.01 drop_nonsink_sim=0.63
