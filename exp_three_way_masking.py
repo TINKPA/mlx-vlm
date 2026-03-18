@@ -389,7 +389,11 @@ def prepare_vision_input(
 
     content = []
     if image is not None:
-        content.append({"type": "image", "image": image})
+        content.append({
+            "type": "image", "image": image,
+            "max_pixels": 401408,  # 512*28*28, ~200-500 tokens
+            "min_pixels": 784,     # 28*28
+        })
     elif video_path is not None:
         content.append({
             "type": "video",
