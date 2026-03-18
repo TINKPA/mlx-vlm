@@ -289,11 +289,16 @@ def main():
                 gt = item["gt"]
                 bm = item["benchmark"]
 
+                # ── Resolve lazy image if needed ──────
+                image = item["image"]
+                if image is None and "_load_image" in item:
+                    image = item["_load_image"]()
+
                 # ── Prepare vision input ──────────────
                 ids, pv, attn_mask, extra = (
                     prepare_vision_input(
                         processor, question, candidates,
-                        image=item["image"],
+                        image=image,
                         video_path=item["video_path"],
                     )
                 )
