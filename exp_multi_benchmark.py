@@ -31,6 +31,32 @@ from typing import List
 import mlx.core as mx
 import numpy as np
 
+
+# ── Structured JSONL logger ───────────────────────────
+
+class ExpLogger:
+    """Append-only JSONL logger for experiment tracking.
+
+    Each line is a self-contained JSON object with timestamp.
+    Analyze with: jq, pandas.read_json(path, lines=True),
+    or grep.
+    """
+
+    def __init__(self, path: str):
+        self.f = open(path, "a")
+
+    def log(self, event: str, **kw):
+        kw["event"] = event
+        kw["ts"] = time.strftime("%Y-%m-%dT%H:%M:%S")
+        self.f.write(json.dumps(kw, default=str) + "\n")
+        self.f.flush()
+
+    def close(self):
+        self.f.close()
+
+
+_lg: ExpLogger = None  # module-level, set in main()
+
 from benchmark_loaders import (
     MVBENCH_TEMPORAL,
     MVBENCH_SPATIAL,
@@ -185,14 +211,27 @@ def main():
 
     sink_dims = [458, 2570]
 
+    # ── Init JSONL logger ─────────────────────────────
+    global _lg
+    log_path = os.path.join(args.output_dir, "exp_run.jsonl")
+    _lg = ExpLogger(log_path)
+    _lg.log("exp_start",
+            model=args.model, seed=args.seed,
+            benchmarks=args.benchmarks,
+            max_per_benchmark=args.max_per_benchmark,
+            tau=args.tau, detect_layer=args.detect_layer,
+            sink_dims=sink_dims)
+
     # ── Load model ────────────────────────────────────
     from mlx_vlm import load
 
     print(f"Loading {args.model}...")
+    _lg.log("model_load_start", model=args.model)
     model, processor = load(args.model)
     patch_model_v2(model)
     mcfg = model.config
     rng = np.random.RandomState(args.seed)
+    _lg.log("model_load_done")
 
     # ── Run benchmarks ────────────────────────────────
     all_results = {}
@@ -204,11 +243,14 @@ def main():
         print(f"BENCHMARK: {bname}")
         print(f"{'='*60}")
 
+        _lg.log("bench_start", benchmark=bname)
         items = load_benchmark(
             bname, args.max_per_benchmark,
             args.seed, args.mvbench_dir,
         )
         print(f"  Loaded {len(items)} items")
+        _lg.log("bench_loaded", benchmark=bname,
+                n_items=len(items))
 
         if not items:
             print("  SKIP: no items loaded")
@@ -399,9 +441,23 @@ def main():
                     f"sink={abl['n_sink']}/{abl['n_vis']}  "
                     f"{q_elapsed:.1f}s"
                 )
+                _lg.log("question",
+                        benchmark=bname, qi=qi,
+                        n_vis=abl["n_vis"],
+                        n_sink=abl["n_sink"],
+                        sink_frac=abl["sink_frac"],
+                        correct_bl=result["correct_bl"],
+                        correct_sm=result["correct_sm"],
+                        correct_he=result["correct_he"],
+                        correct_rand=result["correct_rand"],
+                        correct_anti=result["correct_anti"],
+                        correct_to=result["correct_to"],
+                        elapsed=q_elapsed)
 
             except Exception as ex:
                 print(f"  ERROR Q{qi}: {ex}")
+                _lg.log("error", benchmark=bname, qi=qi,
+                        msg=str(ex))
                 import traceback
                 traceback.print_exc()
 
@@ -409,6 +465,17 @@ def main():
         bench_elapsed = time.time() - t0_bench
         all_results[bname] = results
         _print_benchmark_summary(bname, results, bench_elapsed)
+
+        n = len(results)
+        if n > 0:
+            _lg.log("bench_end", benchmark=bname,
+                    n=n, elapsed_min=round(bench_elapsed/60, 1),
+                    acc_bl=round(sum(r["correct_bl"] for r in results)/n, 3),
+                    acc_sm=round(sum(r["correct_sm"] for r in results)/n, 3),
+                    acc_he=round(sum(r["correct_he"] for r in results)/n, 3),
+                    acc_rand=round(sum(r["correct_rand"] for r in results)/n, 3),
+                    acc_anti=round(sum(r["correct_anti"] for r in results)/n, 3),
+                    acc_to=round(sum(r["correct_to"] for r in results)/n, 3))
 
         # Checkpoint after each benchmark
         _save_results(
@@ -427,6 +494,10 @@ def main():
     _save_results(
         args.output_dir, all_results, args, sink_dims,
     )
+    _lg.log("exp_end",
+            total_min=round(total_elapsed/60, 1),
+            n_benchmarks=len(all_results))
+    _lg.close()
 
 
 def _print_benchmark_summary(
