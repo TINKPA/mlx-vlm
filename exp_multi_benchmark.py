@@ -48,6 +48,17 @@ class ExpLogger:
     def log(self, event: str, **kw):
         kw["event"] = event
         kw["ts"] = time.strftime("%Y-%m-%dT%H:%M:%S")
+        # System stats
+        kw["cpu_load"] = round(os.getloadavg()[0], 2)
+        try:
+            kw["metal_mem_mb"] = round(
+                mx.metal.get_active_memory() / 1e6, 1,
+            )
+            kw["metal_peak_mb"] = round(
+                mx.metal.get_peak_memory() / 1e6, 1,
+            )
+        except Exception:
+            pass
         self.f.write(json.dumps(kw, default=str) + "\n")
         self.f.flush()
 
