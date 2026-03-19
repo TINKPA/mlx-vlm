@@ -36,8 +36,12 @@ import numpy as np
 
 from benchmark_loaders import (
     load_mmstar, load_pope, load_scienceqa_img,
+    load_mvbench_slice,
+    MVBENCH_TEMPORAL, MVBENCH_SPATIAL, MVBENCH_SEMANTIC,
     extract_answer, check_correct,
 )
+
+MVBENCH_DATA_DIR = "/Volumes/RAID0/datasets/MVBench"
 from exp_three_way_masking import (
     patch_model_v2, prepare_vision_input,
     run_baseline, run_soft_mask,
@@ -102,6 +106,21 @@ def load_benchmark(name, max_samples, seed):
         return load_pope(max_samples, seed)
     elif name == "scienceqa":
         return load_scienceqa_img(max_samples, seed)
+    elif name == "mvb-temporal":
+        n_per = max(1, max_samples // len(MVBENCH_TEMPORAL))
+        return load_mvbench_slice(
+            MVBENCH_DATA_DIR, MVBENCH_TEMPORAL, n_per, seed,
+        )[:max_samples]
+    elif name == "mvb-spatial":
+        n_per = max(1, max_samples // len(MVBENCH_SPATIAL))
+        return load_mvbench_slice(
+            MVBENCH_DATA_DIR, MVBENCH_SPATIAL, n_per, seed,
+        )[:max_samples]
+    elif name == "mvb-semantic":
+        n_per = max(1, max_samples // len(MVBENCH_SEMANTIC))
+        return load_mvbench_slice(
+            MVBENCH_DATA_DIR, MVBENCH_SEMANTIC, n_per, seed,
+        )[:max_samples]
     else:
         raise ValueError(f"Unknown benchmark: {name}")
 
@@ -190,8 +209,9 @@ def main():
                 gt = item["gt"]
                 bm = item["benchmark"]
 
-                # Resolve lazy image
-                image = item["image"]
+                # Resolve lazy image or video
+                image = item.get("image")
+                video_path = item.get("video_path")
                 if image is None and "_load_image" in item:
                     image = item["_load_image"]()
 
@@ -200,6 +220,7 @@ def main():
                     prepare_vision_input(
                         processor, question, candidates,
                         image=image,
+                        video_path=video_path,
                     )
                 )
                 s, e = find_image_token_range(ids, mcfg)
