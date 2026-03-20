@@ -261,16 +261,192 @@ def forward_with_mask(
     return hs_np, logits_np
 
 
+def forward_hard_evict(
+    model, ids, pv, attn_mask, extra,
+    evict_positions, seq_len,
+):
+    """
+    Forward pass with tokens physically removed + capture.
+    """
+    from mlx_vlm.models.cache import make_prompt_cache
+    from sink_detect import CaptureStore
+    from exp_three_way_masking import SoftMask
+
+    CaptureStore.enable()
+    SoftMask.disable()
+
+    model.language_model._position_ids = None
+    model.language_model._rope_deltas = None
+
+    cache = make_prompt_cache(model.language_model)
+    eo = model.get_input_embeddings(
+        ids, pv, mask=attn_mask, **extra,
+    )
+    embeds = eo.inputs_embeds
+    pos_ids = model.language_model._position_ids
+    rope_deltas = model.language_model._rope_deltas
+
+    # Build keep mask
+    keep = np.ones(embeds.shape[1], dtype=bool)
+    for p in evict_positions:
+        if p < embeds.shape[1]:
+            keep[p] = False
+    keep_idx = mx.array(np.where(keep)[0])
+
+    evicted_embeds = embeds[:, keep_idx, :]
+    evicted_ids = ids[:, keep_idx]
+    evicted_len = evicted_embeds.shape[1]
+
+    if pos_ids is not None:
+        evicted_pos = pos_ids[:, :, keep_idx]
+    else:
+        evicted_pos = None
+
+    model.language_model._position_ids = evicted_pos
+    if evicted_pos is not None:
+        max_pos = evicted_pos.max()
+        model.language_model._rope_deltas = (
+            max_pos + 1 - evicted_len
+        )
+    else:
+        model.language_model._rope_deltas = rope_deltas
+
+    h = model.language_model.model(
+        evicted_ids, cache=cache,
+        inputs_embeds=evicted_embeds,
+        position_ids=evicted_pos,
+    )
+    mx.eval([c.state for c in cache])
+
+    if model.language_model.args.tie_word_embeddings:
+        logits = (
+            model.language_model.model.embed_tokens
+            .as_linear(h)
+        )
+    else:
+        logits = model.language_model.lm_head(h)
+    logits_np = np.array(logits[0, -1, :]).astype(np.float32)
+
+    # HE has different seq_len — can't directly compare
+    # hidden states per-token with BL. Store as-is.
+    hs_np = []
+    for h_layer in CaptureStore.hidden_states:
+        arr = np.array(h_layer).astype(np.float32)
+        if arr.ndim == 3:
+            arr = arr[0]
+        hs_np.append(arr)
+
+    CaptureStore.disable()
+    del cache, eo, embeds, h
+    mx.metal.clear_cache()
+
+    return hs_np, logits_np
+
+
+def forward_text_only(
+    model, processor, question,
+):
+    """
+    Forward pass with no visual input + capture.
+    """
+    from mlx_vlm.models.cache import make_prompt_cache
+    from sink_detect import CaptureStore
+    from exp_three_way_masking import SoftMask
+    from mlx_vlm.video_generate import process_vision_info
+
+    CaptureStore.enable()
+    SoftMask.disable()
+
+    model.language_model._position_ids = None
+    model.language_model._rope_deltas = None
+
+    msgs = [{
+        "role": "user",
+        "content": [{"type": "text", "text": question}],
+    }]
+    text = processor.apply_chat_template(
+        msgs, tokenize=False,
+        add_generation_prompt=True,
+    )
+    inputs = processor(
+        text=[text], images=None,
+        videos=None, padding=True,
+        return_tensors="pt",
+    )
+    ids = mx.array(inputs["input_ids"])
+
+    cache = make_prompt_cache(model.language_model)
+    embed_tokens = model.language_model.model.embed_tokens
+    embeds = embed_tokens(ids)
+
+    out = model.language_model(
+        ids, inputs_embeds=embeds, cache=cache,
+    )
+    mx.eval([c.state for c in cache])
+
+    logits_np = np.array(
+        out.logits[0, -1, :],
+    ).astype(np.float32)
+
+    hs_np = []
+    for h in CaptureStore.hidden_states:
+        arr = np.array(h).astype(np.float32)
+        if arr.ndim == 3:
+            arr = arr[0]
+        hs_np.append(arr)
+
+    CaptureStore.disable()
+    del cache, embeds, out
+    mx.metal.clear_cache()
+
+    return hs_np, logits_np
+
+
 # ── Per-sample analysis ──────────────────────────────
+
+# Condition labels used throughout
+CONDS = ["bl", "sm", "he", "anti", "r50", "r90", "to"]
+
+
+def _metrics_for_pair(hs_bl, hs_other, logits_bl, logits_other,
+                      tokenizer, n_layers, same_len=True):
+    """Compute per-layer + logit metrics for one BL-vs-X pair."""
+    sve, norm, cosine = [], [], []
+    for li in range(n_layers):
+        sve.append(round(compute_sve(hs_other[li]), 4))
+        norm.append(round(compute_l2_norm(hs_other[li]), 4))
+        if same_len:
+            m, _ = compute_cosine_sim(
+                hs_bl[li], hs_other[li],
+            )
+            cosine.append(round(m, 6))
+        else:
+            cosine.append(float("nan"))
+
+    kl = round(
+        compute_kl_divergence(logits_bl, logits_other), 4,
+    )
+    entropy = round(compute_entropy(logits_other), 4)
+    topk = compute_topk_mass(logits_bl, logits_other)
+    top1 = get_top1_token(logits_other, tokenizer)
+
+    return {
+        "sve": sve, "norm": norm, "cosine": cosine,
+        "kl": kl, "entropy": entropy,
+        "topk": topk, "top1": top1,
+    }
+
 
 def analyze_sample(
     model, processor, ids, pv, attn_mask, extra,
     mcfg, sink_dims, tau, detect_layer, rng,
+    question="",
 ):
     """
-    Run 3 conditions, compute all metrics for one sample.
+    Run 7 conditions, compute all metrics for one sample.
 
-    Returns dict with all metrics (ready for JSONL logging).
+    Conditions: BL, SM-sink, HE, SM-anti-sink,
+                SM-random-50%, SM-random-90%, Text-only
     """
     from sink_detect import find_image_token_range, rmsnorm
 
@@ -278,12 +454,12 @@ def analyze_sample(
     seq_len = ids.shape[1]
     n_vis = e - s
 
-    # ── Condition 1: Baseline ──────────────────────────
+    # ── BL ─────────────────────────────────────────────
     hs_bl, logits_bl = forward_with_capture(
         model, ids, pv, attn_mask, extra,
     )
 
-    # Detect sinks from baseline hidden states
+    # Detect sinks
     hs_detect = hs_bl[detect_layer]
     rms_val = np.abs(rmsnorm(hs_detect))
     phi = np.max(
@@ -295,7 +471,7 @@ def analyze_sample(
     sink_abs = sink_local + s
     n_sink = len(sink_abs)
 
-    # ── Condition 2: SM-sink ───────────────────────────
+    # ── SM-sink ────────────────────────────────────────
     if n_sink > 0:
         hs_sm, logits_sm = forward_with_mask(
             model, ids, pv, attn_mask, extra,
@@ -304,10 +480,44 @@ def analyze_sample(
     else:
         hs_sm, logits_sm = hs_bl, logits_bl
 
-    # ── Condition 3: SM-random-90% ─────────────────────
+    # ── HE (Hard Evict) ───────────────────────────────
+    if n_sink > 0:
+        hs_he, logits_he = forward_hard_evict(
+            model, ids, pv, attn_mask, extra,
+            sink_abs, seq_len,
+        )
+    else:
+        hs_he, logits_he = hs_bl, logits_bl
+
+    # ── SM-anti-sink ───────────────────────────────────
+    if n_sink > 0 and n_sink < n_vis:
+        all_vis = set(range(s, e))
+        sink_set = set(sink_abs.tolist())
+        anti_sink = np.array(sorted(all_vis - sink_set))
+        hs_anti, logits_anti = forward_with_mask(
+            model, ids, pv, attn_mask, extra,
+            anti_sink, seq_len,
+        )
+    else:
+        hs_anti, logits_anti = hs_bl, logits_bl
+
+    # ── SM-random-50% ─────────────────────────────────
+    vis_indices = np.arange(s, e)
+    n_mask_50 = int(0.5 * n_vis)
+    if n_mask_50 > 0:
+        rand_50 = rng.choice(
+            vis_indices, size=n_mask_50, replace=False,
+        )
+        hs_r50, logits_r50 = forward_with_mask(
+            model, ids, pv, attn_mask, extra,
+            rand_50, seq_len,
+        )
+    else:
+        hs_r50, logits_r50 = hs_bl, logits_bl
+
+    # ── SM-random-90% ─────────────────────────────────
     n_mask_90 = int(0.9 * n_vis)
     if n_mask_90 > 0:
-        vis_indices = np.arange(s, e)
         rand_90 = rng.choice(
             vis_indices, size=n_mask_90, replace=False,
         )
@@ -318,83 +528,74 @@ def analyze_sample(
     else:
         hs_r90, logits_r90 = hs_bl, logits_bl
 
+    # ── TO (Text-only) ────────────────────────────────
+    hs_to, logits_to = forward_text_only(
+        model, processor, question,
+    )
+
     # ── Compute metrics ────────────────────────────────
     n_layers = len(hs_bl)
-    sve_bl, sve_sm, sve_r90 = [], [], []
-    norm_bl, norm_sm, norm_r90 = [], [], []
-    cosine_bl_sm, cosine_bl_r90 = [], []
-
-    for li in range(n_layers):
-        sve_bl.append(round(compute_sve(hs_bl[li]), 4))
-        sve_sm.append(round(compute_sve(hs_sm[li]), 4))
-        sve_r90.append(round(compute_sve(hs_r90[li]), 4))
-
-        norm_bl.append(round(compute_l2_norm(hs_bl[li]), 4))
-        norm_sm.append(round(compute_l2_norm(hs_sm[li]), 4))
-        norm_r90.append(round(compute_l2_norm(hs_r90[li]), 4))
-
-        mean_cos_sm, _ = compute_cosine_sim(
-            hs_bl[li], hs_sm[li],
-        )
-        mean_cos_r90, _ = compute_cosine_sim(
-            hs_bl[li], hs_r90[li],
-        )
-        cosine_bl_sm.append(round(mean_cos_sm, 6))
-        cosine_bl_r90.append(round(mean_cos_r90, 6))
-
-    # Output logit metrics
-    kl_bl_sm = round(
-        compute_kl_divergence(logits_bl, logits_sm), 4,
-    )
-    kl_bl_r90 = round(
-        compute_kl_divergence(logits_bl, logits_r90), 4,
-    )
-    entropy_bl = round(compute_entropy(logits_bl), 4)
-    entropy_sm = round(compute_entropy(logits_sm), 4)
-    entropy_r90 = round(compute_entropy(logits_r90), 4)
-
-    topk_sm = compute_topk_mass(logits_bl, logits_sm)
-    topk_r90 = compute_topk_mass(logits_bl, logits_r90)
-
     tokenizer = processor.tokenizer
-    top1_bl = get_top1_token(logits_bl, tokenizer)
-    top1_sm = get_top1_token(logits_sm, tokenizer)
-    top1_r90 = get_top1_token(logits_r90, tokenizer)
 
+    # BL self-metrics
+    sve_bl = [
+        round(compute_sve(hs_bl[li]), 4)
+        for li in range(n_layers)
+    ]
+    norm_bl = [
+        round(compute_l2_norm(hs_bl[li]), 4)
+        for li in range(n_layers)
+    ]
+    entropy_bl = round(compute_entropy(logits_bl), 4)
+    top1_bl = get_top1_token(logits_bl, tokenizer)
+
+    # Per-condition metrics
+    conditions = {
+        "sm": (hs_sm, logits_sm, True),
+        "he": (hs_he, logits_he, n_sink == 0),
+        "anti": (hs_anti, logits_anti, True),
+        "r50": (hs_r50, logits_r50, True),
+        "r90": (hs_r90, logits_r90, True),
+        "to": (hs_to, logits_to, False),
+    }
+
+    metrics = {}
+    for cond, (hs_c, log_c, same_len) in conditions.items():
+        m = _metrics_for_pair(
+            hs_bl, hs_c, logits_bl, log_c,
+            tokenizer, n_layers, same_len,
+        )
+        metrics[cond] = m
+
+    # Build result dict
     result = {
         "n_vis": n_vis,
         "n_sink": n_sink,
+        "n_anti": n_vis - n_sink,
         "sink_frac": round(n_sink / n_vis if n_vis else 0, 3),
         "seq_len": int(seq_len),
         "n_layers": n_layers,
+        "n_mask_50": n_mask_50,
+        "n_mask_90": n_mask_90,
         "sve_bl": sve_bl,
-        "sve_sm": sve_sm,
-        "sve_r90": sve_r90,
         "norm_bl": norm_bl,
-        "norm_sm": norm_sm,
-        "norm_r90": norm_r90,
-        "cosine_bl_sm": cosine_bl_sm,
-        "cosine_bl_r90": cosine_bl_r90,
-        "kl_bl_sm": kl_bl_sm,
-        "kl_bl_r90": kl_bl_r90,
         "entropy_bl": entropy_bl,
-        "entropy_sm": entropy_sm,
-        "entropy_r90": entropy_r90,
-        "topk_retention_sm": topk_sm,
-        "topk_retention_r90": topk_r90,
         "top1_bl": top1_bl,
-        "top1_sm": top1_sm,
-        "top1_r90": top1_r90,
     }
+    for cond, m in metrics.items():
+        result[f"sve_{cond}"] = m["sve"]
+        result[f"norm_{cond}"] = m["norm"]
+        result[f"cosine_bl_{cond}"] = m["cosine"]
+        result[f"kl_bl_{cond}"] = m["kl"]
+        result[f"entropy_{cond}"] = m["entropy"]
+        result[f"topk_retention_{cond}"] = m["topk"]
+        result[f"top1_{cond}"] = m["top1"]
 
-    # Raw data for detailed figures (returned separately)
     raw = {
-        "hs_bl": hs_bl,
-        "hs_sm": hs_sm,
-        "hs_r90": hs_r90,
-        "logits_bl": logits_bl,
-        "logits_sm": logits_sm,
-        "logits_r90": logits_r90,
+        "hs_bl": hs_bl, "logits_bl": logits_bl,
+        "hs_sm": hs_sm, "logits_sm": logits_sm,
+        "hs_r50": hs_r50, "logits_r50": logits_r50,
+        "hs_r90": hs_r90, "logits_r90": logits_r90,
     }
 
     return result, raw
@@ -563,6 +764,7 @@ def main():
                     attn_mask, extra, mcfg,
                     sink_dims, args.tau,
                     args.detect_layer, rng,
+                    question=item["question"],
                 )
 
                 q_elapsed = time.time() - q_start
@@ -592,6 +794,7 @@ def main():
                             for cond, key in [
                                 ("bl", "hs_bl"),
                                 ("sm", "hs_sm"),
+                                ("r50", "hs_r50"),
                                 ("r90", "hs_r90"),
                             ]:
                                 try:
@@ -608,31 +811,30 @@ def main():
                                     pass
 
                     # Per-token cosine for heatmap
-                    cosine_per_token_sm = []
-                    cosine_per_token_r90 = []
-                    for li in range(len(raw["hs_bl"])):
-                        _, cos_sm = compute_cosine_sim(
-                            raw["hs_bl"][li],
-                            raw["hs_sm"][li],
-                        )
-                        _, cos_r90 = compute_cosine_sim(
-                            raw["hs_bl"][li],
-                            raw["hs_r90"][li],
-                        )
-                        cosine_per_token_sm.append(cos_sm)
-                        cosine_per_token_r90.append(cos_r90)
+                    cosine_arrays = {}
+                    for cond, key in [
+                        ("sm", "hs_sm"),
+                        ("r50", "hs_r50"),
+                        ("r90", "hs_r90"),
+                    ]:
+                        cos_list = []
+                        for li in range(len(raw["hs_bl"])):
+                            _, cos = compute_cosine_sim(
+                                raw["hs_bl"][li],
+                                raw[key][li],
+                            )
+                            cos_list.append(cos)
+                        cosine_arrays[
+                            f"cosine_per_token_{cond}"
+                        ] = np.array(cos_list)
 
                     np.savez_compressed(
                         raw_path,
                         logits_bl=raw["logits_bl"],
                         logits_sm=raw["logits_sm"],
+                        logits_r50=raw["logits_r50"],
                         logits_r90=raw["logits_r90"],
-                        cosine_per_token_sm=np.array(
-                            cosine_per_token_sm,
-                        ),
-                        cosine_per_token_r90=np.array(
-                            cosine_per_token_r90,
-                        ),
+                        **cosine_arrays,
                         **svd_spectra,
                     )
                     print(f"    Saved raw -> {raw_path}")
@@ -644,15 +846,15 @@ def main():
                 mx.metal.clear_cache()
 
                 # Print status
+                kls = "  ".join([
+                    f"{c}={result.get(f'kl_bl_{c}', 0):.1f}"
+                    for c in ["sm", "he", "anti",
+                              "r50", "r90", "to"]
+                ])
                 print(
                     f"  [{qi+1}/{len(items)}] "
                     f"sink={result['n_sink']}/{result['n_vis']}  "
-                    f"KL_sm={result['kl_bl_sm']:.1f}  "
-                    f"KL_r90={result['kl_bl_r90']:.1f}  "
-                    f"H_bl={result['entropy_bl']:.1f}  "
-                    f"H_sm={result['entropy_sm']:.1f}  "
-                    f"top1: {result['top1_bl']!r}"
-                    f"→{result['top1_sm']!r}  "
+                    f"KL: {kls}  "
                     f"{q_elapsed:.1f}s"
                 )
 

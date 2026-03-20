@@ -1,21 +1,13 @@
 """
-Visualization for representation analysis experiments.
+Visualization for representation analysis experiments (v2, 7 conditions).
 
-Generates 8 figures from JSONL logs and raw .npz files:
-  1. SVD spectrum (log scale, representative layers)
-  2. Layer-wise SVE evolution
-  3. Layer-wise L2 norm progression
-  4. Cosine similarity heatmap (layer × token position)
-  5. Layer-wise mean cosine similarity
-  6. Prediction entropy violin plot
-  7. Logit KDE plot
-  8. Top-K probability mass retention bar chart
+Generates figures from JSONL logs and raw .npz files.
 
 Usage:
   uv run --with matplotlib --with scipy \
     python viz_representation.py \
-      --input-dir ../../experiments/repr_analysis/full \
-      --output-dir ../../experiments/repr_analysis/full/figures
+      --input-dir ../../experiments/repr_analysis/v2_7cond \
+      --output-dir ../../experiments/repr_analysis/v2_7cond/figures
 """
 
 import argparse
@@ -38,15 +30,29 @@ plt.rcParams.update({
     "figure.figsize": (10, 6),
 })
 
+# 7 conditions with distinct colors
+CONDS = ["sm", "he", "anti", "r50", "r90", "to"]
+LABELS = {
+    "bl": "BL",
+    "sm": "SM-sink",
+    "he": "HE",
+    "anti": "SM-anti",
+    "r50": "SM-rand-50%",
+    "r90": "SM-rand-90%",
+    "to": "Text-only",
+}
 COLORS = {
-    "BL": "#2196F3",
-    "SM-sink": "#F44336",
-    "SM-random-90%": "#4CAF50",
+    "bl": "#2196F3",
+    "sm": "#F44336",
+    "he": "#E91E63",
+    "anti": "#9C27B0",
+    "r50": "#FF9800",
+    "r90": "#4CAF50",
+    "to": "#795548",
 }
 
 
 def load_samples(jsonl_path: str) -> list:
-    """Load all sample events from JSONL."""
     samples = []
     with open(jsonl_path) as f:
         for line in f:
@@ -57,194 +63,229 @@ def load_samples(jsonl_path: str) -> list:
 
 
 def load_raw(raw_dir: str) -> list:
-    """Load raw .npz files."""
     raw_files = sorted(Path(raw_dir).glob("raw_*.npz"))
     return [np.load(f) for f in raw_files]
 
 
-# ── Figure 1: SVD Spectrum ───────────────────────────
+# ── Figure: Layer-wise Cosine Similarity (all conds) ──
 
-def fig_svd_spectrum(raw_data, output_dir):
-    """SVD spectrum comparison for representative layers."""
-    if not raw_data:
-        print("  SKIP fig1: no raw data")
-        return
-
-    d = raw_data[0]
-    layers = [0, 7, 14, 21, 27]
-    available = [
-        li for li in layers if f"svd_bl_L{li}" in d
-    ]
-
-    fig, axes = plt.subplots(
-        1, len(available),
-        figsize=(4 * len(available), 4),
-        sharey=True,
-    )
-    if len(available) == 1:
-        axes = [axes]
-
-    for ax, li in zip(axes, available):
-        svd_bl = d[f"svd_bl_L{li}"]
-        svd_sm = d[f"svd_sm_L{li}"]
-        svd_r90 = d[f"svd_r90_L{li}"]
-
-        ax.semilogy(
-            svd_bl, color=COLORS["BL"],
-            label="BL", linewidth=1.5,
-        )
-        ax.semilogy(
-            svd_sm, color=COLORS["SM-sink"],
-            label="SM-sink", linewidth=1.5,
-        )
-        ax.semilogy(
-            svd_r90, color=COLORS["SM-random-90%"],
-            label="SM-rand-90%", linewidth=1.5,
-        )
-        ax.set_title(f"Layer {li}")
-        ax.set_xlabel("Singular value index")
-        if ax == axes[0]:
-            ax.set_ylabel("Singular value (log scale)")
-        ax.legend()
-        ax.grid(True, alpha=0.3)
-
-    fig.suptitle(
-        "Fig 1: Singular Value Spectrum (BL vs SM-sink "
-        "vs SM-random-90%)",
-        fontsize=13,
-    )
-    fig.tight_layout()
-    fig.savefig(os.path.join(output_dir, "fig1_svd_spectrum.png"))
-    plt.close(fig)
-    print("  Saved fig1_svd_spectrum.png")
-
-
-# ── Figure 2: Layer-wise SVE ─────────────────────────
-
-def fig_sve_by_layer(samples, output_dir):
-    """Layer-wise singular value entropy, averaged."""
+def fig_cosine_by_layer(samples, output_dir):
+    """Layer-wise cosine similarity for all conditions."""
     if not samples:
         return
 
-    n_layers = len(samples[0]["sve_bl"])
+    # Only plot conditions with same seq_len (not HE, TO)
+    plot_conds = ["sm", "anti", "r50", "r90"]
+    n_layers = len(samples[0].get("cosine_bl_sm", []))
+    if n_layers == 0:
+        return
     layers = np.arange(n_layers)
 
-    sve_bl = np.nanmean(
-        [s["sve_bl"] for s in samples], axis=0,
-    )
-    sve_sm = np.nanmean(
-        [s["sve_sm"] for s in samples], axis=0,
-    )
-    sve_r90 = np.nanmean(
-        [s["sve_r90"] for s in samples], axis=0,
-    )
-
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.plot(
-        layers, sve_bl, color=COLORS["BL"],
-        marker="o", markersize=3,
-        label="BL", linewidth=1.5,
-    )
-    ax.plot(
-        layers, sve_sm, color=COLORS["SM-sink"],
-        marker="s", markersize=3,
-        label="SM-sink", linewidth=1.5,
-    )
-    ax.plot(
-        layers, sve_r90, color=COLORS["SM-random-90%"],
-        marker="^", markersize=3,
-        label="SM-rand-90%", linewidth=1.5,
-    )
+    fig, ax = plt.subplots(figsize=(12, 6))
+    for c in plot_conds:
+        key = f"cosine_bl_{c}"
+        data = [s[key] for s in samples if key in s]
+        if not data:
+            continue
+        mean_cos = np.nanmean(data, axis=0)
+        ax.plot(
+            layers, mean_cos, color=COLORS[c],
+            marker="o", markersize=3,
+            label=LABELS[c], linewidth=1.5,
+        )
+    ax.axhline(y=1.0, color="gray", linestyle="--", alpha=0.5)
     ax.set_xlabel("Layer")
-    ax.set_ylabel("Singular Value Entropy")
+    ax.set_ylabel("Mean Cosine Similarity")
     ax.set_title(
-        "Fig 2: Layer-wise SVE "
+        "Layer-wise Cosine Similarity Degradation "
         f"(averaged over {len(samples)} samples)"
     )
     ax.legend()
     ax.grid(True, alpha=0.3)
+    ax.set_ylim(bottom=0.7)
     fig.tight_layout()
-    fig.savefig(os.path.join(output_dir, "fig2_sve_by_layer.png"))
+    fig.savefig(
+        os.path.join(output_dir, "fig_cosine_by_layer.png"),
+    )
     plt.close(fig)
-    print("  Saved fig2_sve_by_layer.png")
+    print("  Saved fig_cosine_by_layer.png")
 
 
-# ── Figure 3: Layer-wise L2 Norm ─────────────────────
+# ── Figure: Layer-wise L2 Norm (all conds) ───────────
 
 def fig_norm_by_layer(samples, output_dir):
-    """Layer-wise mean L2 norm, averaged."""
+    """Layer-wise L2 norm for all conditions."""
     if not samples:
         return
 
-    n_layers = len(samples[0]["norm_bl"])
+    plot_conds = ["bl", "sm", "anti", "r50", "r90"]
+    n_layers = len(samples[0].get("norm_bl", []))
+    if n_layers == 0:
+        return
     layers = np.arange(n_layers)
 
-    norm_bl = np.nanmean(
-        [s["norm_bl"] for s in samples], axis=0,
-    )
-    norm_sm = np.nanmean(
-        [s["norm_sm"] for s in samples], axis=0,
-    )
-    norm_r90 = np.nanmean(
-        [s["norm_r90"] for s in samples], axis=0,
-    )
-
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.plot(
-        layers, norm_bl, color=COLORS["BL"],
-        marker="o", markersize=3,
-        label="BL", linewidth=1.5,
-    )
-    ax.plot(
-        layers, norm_sm, color=COLORS["SM-sink"],
-        marker="s", markersize=3,
-        label="SM-sink", linewidth=1.5,
-    )
-    ax.plot(
-        layers, norm_r90, color=COLORS["SM-random-90%"],
-        marker="^", markersize=3,
-        label="SM-rand-90%", linewidth=1.5,
-    )
+    fig, ax = plt.subplots(figsize=(12, 6))
+    for c in plot_conds:
+        key = f"norm_{c}"
+        data = [s[key] for s in samples if key in s]
+        if not data:
+            continue
+        mean_norm = np.nanmean(data, axis=0)
+        ax.plot(
+            layers, mean_norm, color=COLORS[c],
+            marker="o", markersize=3,
+            label=LABELS[c], linewidth=1.5,
+        )
     ax.set_xlabel("Layer")
     ax.set_ylabel("Mean L2 Norm")
     ax.set_title(
-        "Fig 3: Layer-wise Norm Progression "
+        "Layer-wise Norm Progression "
         f"(averaged over {len(samples)} samples)"
     )
     ax.legend()
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
     fig.savefig(
-        os.path.join(output_dir, "fig3_norm_by_layer.png"),
+        os.path.join(output_dir, "fig_norm_by_layer.png"),
     )
     plt.close(fig)
-    print("  Saved fig3_norm_by_layer.png")
+    print("  Saved fig_norm_by_layer.png")
 
 
-# ── Figure 4: Cosine Similarity Heatmap ──────────────
+# ── Figure: KL Divergence Bar Chart ──────────────────
+
+def fig_kl_bar(samples, output_dir):
+    """Bar chart of KL divergence across conditions."""
+    if not samples:
+        return
+
+    conds = ["anti", "r50", "r90", "sm", "he", "to"]
+    means, medians = [], []
+    labels_list = []
+    colors_list = []
+    for c in conds:
+        key = f"kl_bl_{c}"
+        vals = [s[key] for s in samples if key in s]
+        vals = [v for v in vals if not np.isnan(v)]
+        if vals:
+            means.append(np.mean(vals))
+            medians.append(np.median(vals))
+            labels_list.append(LABELS[c])
+            colors_list.append(COLORS[c])
+
+    x = np.arange(len(labels_list))
+    fig, ax = plt.subplots(figsize=(10, 5))
+    bars = ax.bar(
+        x, means, color=colors_list, alpha=0.8,
+        edgecolor="white", linewidth=0.5,
+    )
+    # Add median markers
+    ax.scatter(
+        x, medians, color="black", zorder=5,
+        s=30, marker="D", label="Median",
+    )
+    for i, (m, med) in enumerate(zip(means, medians)):
+        ax.annotate(
+            f"{m:.2f}", xy=(i, m), xytext=(0, 5),
+            textcoords="offset points", ha="center",
+            fontsize=9,
+        )
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels_list, rotation=15)
+    ax.set_ylabel("KL Divergence (bits)")
+    ax.set_title(
+        f"KL Divergence: BL vs Each Condition "
+        f"({len(samples)} samples)"
+    )
+    ax.legend()
+    ax.grid(True, alpha=0.3, axis="y")
+    fig.tight_layout()
+    fig.savefig(os.path.join(output_dir, "fig_kl_bar.png"))
+    plt.close(fig)
+    print("  Saved fig_kl_bar.png")
+
+
+# ── Figure: Entropy Bar Chart ────────────────────────
+
+def fig_entropy_bar(samples, output_dir):
+    """Bar chart of prediction entropy across conditions."""
+    if not samples:
+        return
+
+    all_conds = ["bl"] + ["sm", "he", "anti", "r50", "r90", "to"]
+    means = []
+    labels_list = []
+    colors_list = []
+    for c in all_conds:
+        key = f"entropy_{c}"
+        vals = [s[key] for s in samples if key in s]
+        vals = [v for v in vals if not np.isnan(v)]
+        if vals:
+            means.append(np.mean(vals))
+            labels_list.append(LABELS[c])
+            colors_list.append(COLORS[c])
+
+    x = np.arange(len(labels_list))
+    fig, ax = plt.subplots(figsize=(10, 5))
+    bars = ax.bar(
+        x, means, color=colors_list, alpha=0.8,
+        edgecolor="white", linewidth=0.5,
+    )
+    for i, m in enumerate(means):
+        ax.annotate(
+            f"{m:.2f}", xy=(i, m), xytext=(0, 5),
+            textcoords="offset points", ha="center",
+            fontsize=9,
+        )
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels_list, rotation=15)
+    ax.set_ylabel("Prediction Entropy (bits)")
+    ax.set_title(
+        f"Prediction Entropy per Condition "
+        f"({len(samples)} samples)"
+    )
+    ax.grid(True, alpha=0.3, axis="y")
+    fig.tight_layout()
+    fig.savefig(
+        os.path.join(output_dir, "fig_entropy_bar.png"),
+    )
+    plt.close(fig)
+    print("  Saved fig_entropy_bar.png")
+
+
+# ── Figure: Cosine Similarity Heatmap ────────────────
 
 def fig_cosine_heatmap(raw_data, output_dir):
-    """2D heatmap: layer × token position."""
+    """2D heatmaps for SM-sink, SM-r50, SM-r90."""
     if not raw_data:
-        print("  SKIP fig4: no raw data")
+        print("  SKIP fig_cosine_heatmap: no raw data")
         return
 
     d = raw_data[0]
-    cos_sm = d["cosine_per_token_sm"]   # [n_layers, seq_len]
-    cos_r90 = d["cosine_per_token_r90"]
+    panels = []
+    for key, title in [
+        ("cosine_per_token_sm", "BL vs SM-sink"),
+        ("cosine_per_token_r50", "BL vs SM-rand-50%"),
+        ("cosine_per_token_r90", "BL vs SM-rand-90%"),
+    ]:
+        if key in d:
+            panels.append((d[key], title))
+
+    if not panels:
+        return
 
     fig, axes = plt.subplots(
-        1, 2, figsize=(16, 6), sharey=True,
+        1, len(panels), figsize=(6 * len(panels), 5),
+        sharey=True,
     )
+    if len(panels) == 1:
+        axes = [axes]
 
-    for ax, data, title in [
-        (axes[0], cos_sm, "BL vs SM-sink"),
-        (axes[1], cos_r90, "BL vs SM-random-90%"),
-    ]:
+    for ax, (data, title) in zip(axes, panels):
         im = ax.imshow(
             data, aspect="auto", cmap="RdYlGn",
-            vmin=0.5, vmax=1.0,
-            origin="lower",
+            vmin=0.5, vmax=1.0, origin="lower",
         )
         ax.set_xlabel("Token Position")
         ax.set_ylabel("Layer")
@@ -252,311 +293,209 @@ def fig_cosine_heatmap(raw_data, output_dir):
         plt.colorbar(im, ax=ax, label="Cosine Similarity")
 
     fig.suptitle(
-        "Fig 4: Cosine Similarity Heatmap "
-        "(BL vs Masked Conditions)",
+        "Cosine Similarity Heatmap (layer x token)",
         fontsize=13,
     )
     fig.tight_layout()
     fig.savefig(
-        os.path.join(output_dir, "fig4_cosine_heatmap.png"),
+        os.path.join(output_dir, "fig_cosine_heatmap.png"),
     )
     plt.close(fig)
-    print("  Saved fig4_cosine_heatmap.png")
+    print("  Saved fig_cosine_heatmap.png")
 
 
-# ── Figure 5: Layer-wise Mean Cosine ─────────────────
+# ── Figure: Dose-Response Summary ────────────────────
 
-def fig_cosine_by_layer(samples, output_dir):
-    """Layer-wise mean cosine similarity, averaged."""
+def fig_dose_response(samples, output_dir):
+    """Scatter: masking ratio vs cosine similarity / KL."""
     if not samples:
         return
 
-    n_layers = len(samples[0]["cosine_bl_sm"])
-    layers = np.arange(n_layers)
+    # For each sample, compute per-condition masking ratio
+    # and corresponding cosine/KL
+    points = []  # (ratio, cos, kl, condition)
+    for s in samples:
+        n_vis = s["n_vis"]
+        n_sink = s["n_sink"]
+        if n_vis == 0:
+            continue
 
-    cos_sm = np.nanmean(
-        [s["cosine_bl_sm"] for s in samples], axis=0,
-    )
-    cos_r90 = np.nanmean(
-        [s["cosine_bl_r90"] for s in samples], axis=0,
-    )
+        configs = [
+            ("anti", (n_vis - n_sink) / n_vis),
+            ("r50", 0.5),
+            ("r90", 0.9),
+            ("sm", n_sink / n_vis),
+        ]
+        for c, ratio in configs:
+            cos_key = f"cosine_bl_{c}"
+            kl_key = f"kl_bl_{c}"
+            if cos_key in s and kl_key in s:
+                cos_val = s[cos_key][-1]
+                kl_val = s[kl_key]
+                if not np.isnan(cos_val) and not np.isnan(kl_val):
+                    points.append((ratio, cos_val, kl_val, c))
 
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.plot(
-        layers, cos_sm, color=COLORS["SM-sink"],
-        marker="s", markersize=3,
-        label="BL vs SM-sink", linewidth=1.5,
-    )
-    ax.plot(
-        layers, cos_r90, color=COLORS["SM-random-90%"],
-        marker="^", markersize=3,
-        label="BL vs SM-rand-90%", linewidth=1.5,
-    )
-    ax.axhline(y=1.0, color="gray", linestyle="--", alpha=0.5)
-    ax.set_xlabel("Layer")
-    ax.set_ylabel("Mean Cosine Similarity")
-    ax.set_title(
-        "Fig 5: Layer-wise Cosine Similarity Degradation "
-        f"(averaged over {len(samples)} samples)"
-    )
-    ax.legend()
-    ax.grid(True, alpha=0.3)
-    ax.set_ylim(bottom=0)
-    fig.tight_layout()
-    fig.savefig(
-        os.path.join(output_dir, "fig5_cosine_by_layer.png"),
-    )
-    plt.close(fig)
-    print("  Saved fig5_cosine_by_layer.png")
-
-
-# ── Figure 6: Entropy Violin Plot ────────────────────
-
-def fig_entropy_violin(samples, output_dir):
-    """Violin plot of prediction entropy across conditions."""
-    if not samples:
+    if not points:
         return
 
-    data = [
-        [s["entropy_bl"] for s in samples
-         if not np.isnan(s["entropy_bl"])],
-        [s["entropy_sm"] for s in samples
-         if not np.isnan(s["entropy_sm"])],
-        [s["entropy_r90"] for s in samples
-         if not np.isnan(s["entropy_r90"])],
-    ]
-    labels = ["BL", "SM-sink", "SM-rand-90%"]
-    colors = [
-        COLORS["BL"], COLORS["SM-sink"],
-        COLORS["SM-random-90%"],
-    ]
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
-    fig, ax = plt.subplots(figsize=(8, 6))
-    parts = ax.violinplot(
-        data, positions=[1, 2, 3],
-        showmeans=True, showmedians=True,
-    )
+    for c in ["anti", "r50", "r90", "sm"]:
+        pts = [(r, cos, kl) for r, cos, kl, cc in points
+               if cc == c]
+        if not pts:
+            continue
+        ratios = [p[0] for p in pts]
+        cos_vals = [p[1] for p in pts]
+        kl_vals = [p[2] for p in pts]
 
-    for i, pc in enumerate(parts["bodies"]):
-        pc.set_facecolor(colors[i])
-        pc.set_alpha(0.7)
-
-    ax.set_xticks([1, 2, 3])
-    ax.set_xticklabels(labels)
-    ax.set_ylabel("Prediction Entropy (bits)")
-    ax.set_title(
-        "Fig 6: Prediction Entropy Distribution "
-        f"({len(samples)} samples)"
-    )
-    ax.grid(True, alpha=0.3, axis="y")
-
-    # Add mean annotations
-    for i, d in enumerate(data):
-        mean_val = np.mean(d)
-        ax.annotate(
-            f"{mean_val:.2f}",
-            xy=(i + 1, mean_val),
-            xytext=(10, 5),
-            textcoords="offset points",
-            fontsize=9, color=colors[i],
+        ax1.scatter(
+            ratios, cos_vals, color=COLORS[c],
+            alpha=0.3, s=15, label=LABELS[c],
+        )
+        # Mean marker
+        ax1.scatter(
+            [np.mean(ratios)], [np.mean(cos_vals)],
+            color=COLORS[c], s=100, marker="D",
+            edgecolor="black", linewidth=1, zorder=5,
         )
 
-    fig.tight_layout()
-    fig.savefig(
-        os.path.join(output_dir, "fig6_entropy_violin.png"),
-    )
-    plt.close(fig)
-    print("  Saved fig6_entropy_violin.png")
+        ax2.scatter(
+            ratios, kl_vals, color=COLORS[c],
+            alpha=0.3, s=15, label=LABELS[c],
+        )
+        ax2.scatter(
+            [np.mean(ratios)], [np.mean(kl_vals)],
+            color=COLORS[c], s=100, marker="D",
+            edgecolor="black", linewidth=1, zorder=5,
+        )
 
+    ax1.set_xlabel("Masking Ratio")
+    ax1.set_ylabel("Cosine Similarity (last layer)")
+    ax1.set_title("Dose-Response: Masking Ratio vs Cosine")
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
 
-# ── Figure 7: Logit KDE ─────────────────────────────
-
-def fig_logit_kde(raw_data, output_dir):
-    """KDE of logit values for representative samples."""
-    if not raw_data:
-        print("  SKIP fig7: no raw data")
-        return
-
-    n_plots = min(3, len(raw_data))
-    fig, axes = plt.subplots(
-        1, n_plots, figsize=(5 * n_plots, 4),
-        sharey=True,
-    )
-    if n_plots == 1:
-        axes = [axes]
-
-    for idx, (ax, d) in enumerate(zip(axes, raw_data)):
-        for key, label, color in [
-            ("logits_bl", "BL", COLORS["BL"]),
-            ("logits_sm", "SM-sink", COLORS["SM-sink"]),
-            ("logits_r90", "SM-rand-90%",
-             COLORS["SM-random-90%"]),
-        ]:
-            logits = d[key]
-            # Use histogram as KDE approximation
-            ax.hist(
-                logits, bins=100, density=True,
-                alpha=0.5, color=color, label=label,
-                histtype="stepfilled",
-            )
-        ax.set_xlabel("Logit value")
-        if ax == axes[0]:
-            ax.set_ylabel("Density")
-        ax.set_title(f"Sample {idx}")
-        ax.legend(fontsize=8)
-        ax.grid(True, alpha=0.3)
+    ax2.set_xlabel("Masking Ratio")
+    ax2.set_ylabel("KL Divergence (bits)")
+    ax2.set_title("Dose-Response: Masking Ratio vs KL")
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
 
     fig.suptitle(
-        "Fig 7: Logit Distribution (Full Vocabulary)",
+        "Dose-Response: SM-sink causes MORE damage than "
+        "equal-ratio random masking",
         fontsize=13,
     )
     fig.tight_layout()
-    fig.savefig(os.path.join(output_dir, "fig7_logit_kde.png"))
+    fig.savefig(
+        os.path.join(output_dir, "fig_dose_response.png"),
+    )
     plt.close(fig)
-    print("  Saved fig7_logit_kde.png")
+    print("  Saved fig_dose_response.png")
 
 
-# ── Figure 8: Top-K Retention Bar Chart ──────────────
+# ── Figure: Top-K Retention ──────────────────────────
 
 def fig_topk_retention(samples, output_dir):
-    """Bar chart of top-K probability mass retention."""
+    """Top-K retention across all conditions."""
     if not samples:
         return
 
+    conds = ["anti", "r50", "r90", "sm", "he", "to"]
     ks = ["1", "5", "10"]
 
-    retention_sm = {
-        k: np.nanmean([
-            s["topk_retention_sm"][k] for s in samples
-        ]) for k in ks
-    }
-    retention_r90 = {
-        k: np.nanmean([
-            s["topk_retention_r90"][k] for s in samples
-        ]) for k in ks
-    }
+    retention = {}
+    for c in conds:
+        key = f"topk_retention_{c}"
+        for k in ks:
+            vals = [
+                s[key][k] for s in samples
+                if key in s and k in s.get(key, {})
+            ]
+            vals = [v for v in vals if not np.isnan(v)]
+            retention[(c, k)] = np.mean(vals) if vals else 0
 
     x = np.arange(len(ks))
-    width = 0.35
+    width = 0.12
+    fig, ax = plt.subplots(figsize=(10, 5))
 
-    fig, ax = plt.subplots(figsize=(8, 5))
-    bars_sm = ax.bar(
-        x - width / 2,
-        [retention_sm[k] for k in ks],
-        width, label="SM-sink",
-        color=COLORS["SM-sink"], alpha=0.8,
-    )
-    bars_r90 = ax.bar(
-        x + width / 2,
-        [retention_r90[k] for k in ks],
-        width, label="SM-rand-90%",
-        color=COLORS["SM-random-90%"], alpha=0.8,
-    )
+    for i, c in enumerate(conds):
+        vals = [retention[(c, k)] for k in ks]
+        ax.bar(
+            x + i * width, vals, width,
+            label=LABELS[c], color=COLORS[c], alpha=0.8,
+        )
 
-    ax.set_xlabel("Top-K")
-    ax.set_ylabel("Probability Mass Retention")
-    ax.set_title(
-        "Fig 8: Top-K Probability Mass Retention "
-        f"(averaged over {len(samples)} samples)"
-    )
-    ax.set_xticks(x)
+    ax.set_xticks(x + width * (len(conds) - 1) / 2)
     ax.set_xticklabels([f"Top-{k}" for k in ks])
-    ax.legend()
+    ax.set_ylabel("Probability Mass Retention")
+    ax.set_title(f"Top-K Retention ({len(samples)} samples)")
+    ax.legend(fontsize=8)
     ax.set_ylim(0, 1.1)
     ax.axhline(y=1.0, color="gray", linestyle="--", alpha=0.5)
     ax.grid(True, alpha=0.3, axis="y")
-
-    # Add value labels
-    for bars in [bars_sm, bars_r90]:
-        for bar in bars:
-            h = bar.get_height()
-            ax.annotate(
-                f"{h:.2f}",
-                xy=(bar.get_x() + bar.get_width() / 2, h),
-                xytext=(0, 3),
-                textcoords="offset points",
-                ha="center", fontsize=9,
-            )
-
     fig.tight_layout()
     fig.savefig(
-        os.path.join(output_dir, "fig8_topk_retention.png"),
+        os.path.join(output_dir, "fig_topk_retention.png"),
     )
     plt.close(fig)
-    print("  Saved fig8_topk_retention.png")
+    print("  Saved fig_topk_retention.png")
 
 
-# ── Summary Statistics ───────────────────────────────
+# ── Summary ──────────────────────────────────────────
 
 def print_summary(samples):
-    """Print summary statistics for the experiment."""
     n = len(samples)
     if n == 0:
-        print("No samples to summarize.")
         return
 
     print(f"\n{'='*60}")
     print(f"SUMMARY ({n} samples)")
     print(f"{'='*60}")
 
-    # KL divergence
-    kl_sm = [s["kl_bl_sm"] for s in samples]
-    kl_r90 = [s["kl_bl_r90"] for s in samples]
-    print(f"\nKL Divergence (bits):")
-    print(f"  BL vs SM-sink:     "
-          f"mean={np.nanmean(kl_sm):.2f}  "
-          f"median={np.nanmedian(kl_sm):.2f}  "
-          f"std={np.nanstd(kl_sm):.2f}")
-    print(f"  BL vs SM-rand-90%: "
-          f"mean={np.nanmean(kl_r90):.2f}  "
-          f"median={np.nanmedian(kl_r90):.2f}  "
-          f"std={np.nanstd(kl_r90):.2f}")
+    print(f"\nSink fraction: "
+          f"{np.mean([s['sink_frac'] for s in samples]):.1%}")
 
-    # Entropy
-    ent_bl = [s["entropy_bl"] for s in samples]
-    ent_sm = [s["entropy_sm"] for s in samples]
-    ent_r90 = [s["entropy_r90"] for s in samples]
-    print(f"\nPrediction Entropy (bits):")
-    print(f"  BL:            mean={np.nanmean(ent_bl):.2f}")
-    print(f"  SM-sink:       mean={np.nanmean(ent_sm):.2f}")
-    print(f"  SM-rand-90%:   mean={np.nanmean(ent_r90):.2f}")
+    conds_cos = ["sm", "anti", "r50", "r90"]
+    conds_kl = ["sm", "he", "anti", "r50", "r90", "to"]
 
-    # Top-1 retention
-    top1_sm = [s["topk_retention_sm"]["1"] for s in samples]
-    top1_r90 = [s["topk_retention_r90"]["1"] for s in samples]
-    print(f"\nTop-1 Probability Retention:")
-    print(f"  SM-sink:       mean={np.mean(top1_sm):.3f}")
-    print(f"  SM-rand-90%:   mean={np.mean(top1_r90):.3f}")
-
-    # Sink fraction
-    sink_frac = [s["sink_frac"] for s in samples]
-    print(f"\nSink Fraction: mean={np.mean(sink_frac):.1%}")
-
-    # Cosine similarity at last layer
-    cos_sm_last = [s["cosine_bl_sm"][-1] for s in samples]
-    cos_r90_last = [s["cosine_bl_r90"][-1] for s in samples]
     print(f"\nCosine Similarity (last layer):")
-    print(f"  BL vs SM-sink:     "
-          f"mean={np.nanmean(cos_sm_last):.4f}")
-    print(f"  BL vs SM-rand-90%: "
-          f"mean={np.nanmean(cos_r90_last):.4f}")
+    for c in conds_cos:
+        key = f"cosine_bl_{c}"
+        vals = [s[key][-1] for s in samples
+                if key in s and not np.isnan(s[key][-1])]
+        if vals:
+            print(f"  {LABELS[c]:<14s}: {np.mean(vals):.4f}")
+
+    print(f"\nKL Divergence (bits):")
+    for c in conds_kl:
+        key = f"kl_bl_{c}"
+        vals = [s[key] for s in samples
+                if key in s and not np.isnan(s[key])]
+        if vals:
+            print(f"  {LABELS[c]:<14s}: "
+                  f"mean={np.mean(vals):.3f}  "
+                  f"med={np.median(vals):.3f}")
+
+    print(f"\nPrediction Entropy (bits):")
+    bl_vals = [s["entropy_bl"] for s in samples
+               if not np.isnan(s["entropy_bl"])]
+    print(f"  {'BL':<14s}: {np.mean(bl_vals):.3f}")
+    for c in conds_kl:
+        key = f"entropy_{c}"
+        vals = [s[key] for s in samples
+                if key in s and not np.isnan(s[key])]
+        if vals:
+            print(f"  {LABELS[c]:<14s}: {np.mean(vals):.3f}")
 
 
 # ── Main ─────────────────────────────────────────────
 
 def main():
-    ap = argparse.ArgumentParser(
-        description="Visualize representation analysis results",
-    )
-    ap.add_argument(
-        "--input-dir", required=True,
-        help="Directory containing exp_run.jsonl and raw/",
-    )
-    ap.add_argument(
-        "--output-dir", default=None,
-        help="Output directory for figures (default: "
-             "input_dir/figures)",
-    )
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--input-dir", required=True)
+    ap.add_argument("--output-dir", default=None)
     args = ap.parse_args()
 
     if args.output_dir is None:
@@ -565,32 +504,27 @@ def main():
         )
     os.makedirs(args.output_dir, exist_ok=True)
 
-    # Load data
     jsonl_path = os.path.join(args.input_dir, "exp_run.jsonl")
-    print(f"Loading samples from {jsonl_path}...")
+    print(f"Loading from {jsonl_path}...")
     samples = load_samples(jsonl_path)
-    print(f"  Found {len(samples)} samples")
+    print(f"  {len(samples)} samples")
 
     raw_dir = os.path.join(args.input_dir, "raw")
     raw_data = []
     if os.path.isdir(raw_dir):
         raw_data = load_raw(raw_dir)
-        print(f"  Found {len(raw_data)} raw files")
+        print(f"  {len(raw_data)} raw files")
 
-    # Print summary
     print_summary(samples)
 
-    # Generate figures
     print(f"\nGenerating figures -> {args.output_dir}")
-    fig_svd_spectrum(raw_data, args.output_dir)
-    fig_sve_by_layer(samples, args.output_dir)
-    fig_norm_by_layer(samples, args.output_dir)
-    fig_cosine_heatmap(raw_data, args.output_dir)
     fig_cosine_by_layer(samples, args.output_dir)
-    fig_entropy_violin(samples, args.output_dir)
-    fig_logit_kde(raw_data, args.output_dir)
+    fig_norm_by_layer(samples, args.output_dir)
+    fig_kl_bar(samples, args.output_dir)
+    fig_entropy_bar(samples, args.output_dir)
+    fig_cosine_heatmap(raw_data, args.output_dir)
+    fig_dose_response(samples, args.output_dir)
     fig_topk_retention(samples, args.output_dir)
-
     print("\nDone.")
 
 
