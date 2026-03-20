@@ -31,11 +31,12 @@ plt.rcParams.update({
 })
 
 # 7 conditions with distinct colors
-CONDS = ["sm", "he", "anti", "r50", "r90", "to"]
+CONDS = ["sm", "he", "pm", "anti", "r50", "r90", "to"]
 LABELS = {
     "bl": "BL",
     "sm": "SM-sink",
     "he": "HE",
+    "pm": "PM (pixel-mask)",
     "anti": "SM-anti",
     "r50": "SM-rand-50%",
     "r90": "SM-rand-90%",
@@ -45,6 +46,7 @@ COLORS = {
     "bl": "#2196F3",
     "sm": "#F44336",
     "he": "#E91E63",
+    "pm": "#00BCD4",
     "anti": "#9C27B0",
     "r50": "#FF9800",
     "r90": "#4CAF50",
@@ -74,14 +76,20 @@ def fig_cosine_by_layer(samples, output_dir):
     if not samples:
         return
 
-    # Only plot conditions with same seq_len (not HE, TO)
-    plot_conds = ["sm", "anti", "r50", "r90"]
+    plot_conds = ["sm", "pm", "anti", "r50", "r90"]
     n_layers = len(samples[0].get("cosine_bl_sm", []))
     if n_layers == 0:
         return
     layers = np.arange(n_layers)
 
     fig, ax = plt.subplots(figsize=(12, 6))
+    # BL reference line (cosine with itself = 1.0)
+    ax.plot(
+        layers, np.ones(n_layers), color=COLORS["bl"],
+        marker="o", markersize=3,
+        label="BL (reference)", linewidth=2,
+        linestyle="--",
+    )
     for c in plot_conds:
         key = f"cosine_bl_{c}"
         data = [s[key] for s in samples if key in s]
@@ -93,7 +101,6 @@ def fig_cosine_by_layer(samples, output_dir):
             marker="o", markersize=3,
             label=LABELS[c], linewidth=1.5,
         )
-    ax.axhline(y=1.0, color="gray", linestyle="--", alpha=0.5)
     ax.set_xlabel("Layer")
     ax.set_ylabel("Mean Cosine Similarity")
     ax.set_title(
@@ -102,7 +109,15 @@ def fig_cosine_by_layer(samples, output_dir):
     )
     ax.legend()
     ax.grid(True, alpha=0.3)
-    ax.set_ylim(bottom=0.7)
+    # Auto-adjust y-axis to include all conditions
+    all_vals = []
+    for c in plot_conds:
+        key = f"cosine_bl_{c}"
+        data = [s[key] for s in samples if key in s]
+        if data:
+            all_vals.extend(np.nanmean(data, axis=0).tolist())
+    y_min = min(all_vals) - 0.05 if all_vals else 0.0
+    ax.set_ylim(bottom=max(0, y_min))
     fig.tight_layout()
     fig.savefig(
         os.path.join(output_dir, "fig_cosine_by_layer.png"),
@@ -118,7 +133,7 @@ def fig_norm_by_layer(samples, output_dir):
     if not samples:
         return
 
-    plot_conds = ["bl", "sm", "anti", "r50", "r90"]
+    plot_conds = ["bl", "sm", "pm", "anti", "r50", "r90"]
     n_layers = len(samples[0].get("norm_bl", []))
     if n_layers == 0:
         return
@@ -159,10 +174,12 @@ def fig_kl_bar(samples, output_dir):
     if not samples:
         return
 
-    conds = ["anti", "r50", "r90", "sm", "he", "to"]
-    means, medians = [], []
-    labels_list = []
-    colors_list = []
+    # Start with BL (KL=0 by definition)
+    conds = ["anti", "pm", "r50", "r90", "sm", "he", "to"]
+    means = [0.0]
+    medians = [0.0]
+    labels_list = ["BL"]
+    colors_list = [COLORS["bl"]]
     for c in conds:
         key = f"kl_bl_{c}"
         vals = [s[key] for s in samples if key in s]
@@ -213,7 +230,7 @@ def fig_entropy_bar(samples, output_dir):
     if not samples:
         return
 
-    all_conds = ["bl"] + ["sm", "he", "anti", "r50", "r90", "to"]
+    all_conds = ["bl"] + ["sm", "he", "pm", "anti", "r50", "r90", "to"]
     means = []
     labels_list = []
     colors_list = []
@@ -402,7 +419,7 @@ def fig_topk_retention(samples, output_dir):
     if not samples:
         return
 
-    conds = ["anti", "r50", "r90", "sm", "he", "to"]
+    conds = ["anti", "pm", "r50", "r90", "sm", "he", "to"]
     ks = ["1", "5", "10"]
 
     retention = {}
@@ -457,8 +474,8 @@ def print_summary(samples):
     print(f"\nSink fraction: "
           f"{np.mean([s['sink_frac'] for s in samples]):.1%}")
 
-    conds_cos = ["sm", "anti", "r50", "r90"]
-    conds_kl = ["sm", "he", "anti", "r50", "r90", "to"]
+    conds_cos = ["sm", "pm", "anti", "r50", "r90"]
+    conds_kl = ["sm", "he", "pm", "anti", "r50", "r90", "to"]
 
     print(f"\nCosine Similarity (last layer):")
     for c in conds_cos:

@@ -343,6 +343,37 @@ def forward_hard_evict(
     return hs_np, logits_np
 
 
+def forward_pixel_masked(
+    model, ids, pv, attn_mask, extra,
+    sink_local_indices, grid_thw, spatial_merge_size=2,
+):
+    """
+    Forward pass with sink patches zeroed out in pixel_values.
+
+    Tokens remain at same positions but carry "black" content.
+    Tests whether attention still flows to these positions
+    (position-driven) or shifts away (content-driven).
+    """
+    from exp_pixel_masking import sink_indices_to_pixel_mask
+
+    T, H, W = grid_thw
+    patch_idx = sink_indices_to_pixel_mask(
+        sink_local_indices, (T, H, W), spatial_merge_size,
+    )
+
+    # Zero out the selected patches
+    pv_masked = mx.array(np.array(pv))  # copy
+    pv_np = np.array(pv_masked)
+    valid = patch_idx[patch_idx < pv_np.shape[0]]
+    if len(valid) > 0:
+        pv_np[valid] = 0.0
+    pv_masked = mx.array(pv_np)
+
+    return forward_with_capture(
+        model, ids, pv_masked, attn_mask, extra,
+    )
+
+
 def forward_text_only(
     model, processor, question,
 ):
@@ -489,6 +520,33 @@ def analyze_sample(
     else:
         hs_he, logits_he = hs_bl, logits_bl
 
+    # ── PM (Pixel Masking) ──────────────────────────────
+    # Zero out sink patches in pixel_values, re-run through
+    # vision encoder. Same positions, "black" content.
+    if n_sink > 0 and pv is not None:
+        # Get grid_thw for spatial mapping
+        grid_key = (
+            "image_grid_thw"
+            if "image_grid_thw" in extra
+            else "video_grid_thw"
+        )
+        if grid_key in extra:
+            grid_thw = tuple(
+                int(x) for x in np.array(extra[grid_key][0])
+            )
+            sms = getattr(
+                mcfg, "vision_config", mcfg,
+            )
+            sms_val = getattr(sms, "spatial_merge_size", 2)
+            hs_pm, logits_pm = forward_pixel_masked(
+                model, ids, pv, attn_mask, extra,
+                sink_local, grid_thw, sms_val,
+            )
+        else:
+            hs_pm, logits_pm = hs_bl, logits_bl
+    else:
+        hs_pm, logits_pm = hs_bl, logits_bl
+
     # ── SM-anti-sink ───────────────────────────────────
     if n_sink > 0 and n_sink < n_vis:
         all_vis = set(range(s, e))
@@ -553,6 +611,7 @@ def analyze_sample(
     conditions = {
         "sm": (hs_sm, logits_sm, True),
         "he": (hs_he, logits_he, n_sink == 0),
+        "pm": (hs_pm, logits_pm, True),
         "anti": (hs_anti, logits_anti, True),
         "r50": (hs_r50, logits_r50, True),
         "r90": (hs_r90, logits_r90, True),
@@ -848,7 +907,7 @@ def main():
                 # Print status
                 kls = "  ".join([
                     f"{c}={result.get(f'kl_bl_{c}', 0):.1f}"
-                    for c in ["sm", "he", "anti",
+                    for c in ["sm", "he", "pm", "anti",
                               "r50", "r90", "to"]
                 ])
                 print(
