@@ -247,23 +247,34 @@ def attn_to_spatial(
         q_start = max(e, q_end - 10)
         query_range = slice(q_start, q_end)
 
+    # For list-based indexing, extract submatrix first
+    if isinstance(query_range, (list, np.ndarray)):
+        q_idx = np.array(query_range)
+        # Filter valid indices
+        q_idx = q_idx[q_idx < attn_layer.shape[1]]
+        if len(q_idx) == 0:
+            return np.zeros((H // sms, W // sms)), head_idx
+        attn_sub = attn_layer[:, q_idx, :][:, :, s:e]
+    else:
+        attn_sub = attn_layer[:, query_range, s:e]
+
     # Select heads
     if head_mode == "mean":
-        # Mean across all heads
-        attn_slice = attn_layer[:, query_range, s:e]
-        attn_agg = attn_slice.mean(axis=(0, 1))  # [n_vis]
+        attn_agg = attn_sub.mean(axis=(0, 1))  # [n_vis]
     elif head_mode == "single" and head_idx is not None:
-        attn_slice = attn_layer[head_idx, query_range, s:e]
-        attn_agg = attn_slice.mean(axis=0)  # [n_vis]
+        if isinstance(query_range, (list, np.ndarray)):
+            attn_agg = attn_sub[head_idx].mean(axis=0)
+        else:
+            attn_agg = attn_layer[
+                head_idx, query_range, s:e
+            ].mean(axis=0)
     elif head_mode == "max_sink":
-        # Head with highest mean attention to sink positions
-        attn_to_vis = attn_layer[:, query_range, s:e]
-        head_means = attn_to_vis.mean(axis=(1, 2))
+        head_means = attn_sub.mean(axis=(1, 2))
         best_head = np.argmax(head_means)
-        attn_agg = attn_to_vis[best_head].mean(axis=0)
+        attn_agg = attn_sub[best_head].mean(axis=0)
         head_idx = best_head
     else:
-        attn_agg = attn_layer.mean(axis=0)[query_range, s:e].mean(axis=0)
+        attn_agg = attn_sub.mean(axis=(0, 1))
 
     # Reshape to spatial grid (average over frames)
     tokens_per_frame = llm_H * llm_W
@@ -457,6 +468,215 @@ def generate_sink_vs_content_heads(
     fig.tight_layout()
     fig.savefig(output_path, dpi=150)
     plt.close(fig)
+
+
+# ── Bidirectional attention flow ──────────────────────
+
+def generate_bidirectional_flow(
+    attn_conditions, s, e, grid_thw, sms,
+    sink_local, layers, output_path, sample_id="",
+):
+    """
+    Side-by-side: 'Who looks at sinks' vs 'Where sinks look'.
+
+    Left column:  all non-visual queries → visual keys (sink-as-key)
+    Right column: sink queries → visual keys (sink-as-query)
+    """
+    cond_names = list(attn_conditions.keys())
+    n_conds = len(cond_names)
+    n_layers = len(layers)
+
+    fig, axes = plt.subplots(
+        n_layers, n_conds * 2,
+        figsize=(3 * n_conds * 2, 3 * n_layers),
+    )
+    if n_layers == 1:
+        axes = axes.reshape(1, -1)
+
+    sink_abs = sink_local + s
+
+    for li_idx, layer_num in enumerate(layers):
+        for ci, cname in enumerate(cond_names):
+            attn_list, label, _ = attn_conditions[cname]
+            if layer_num >= len(attn_list):
+                continue
+            attn_layer = attn_list[layer_num]
+            q_end = attn_layer.shape[1]
+
+            # ── Left: who looks at sinks (text → visual) ──
+            ax_left = axes[li_idx, ci]
+            q_start = max(e, q_end - 10)
+            spatial_key, _ = attn_to_spatial(
+                attn_layer, s, e, grid_thw, sms,
+                query_range=slice(q_start, q_end),
+                head_mode="mean",
+            )
+            ax_left.imshow(
+                spatial_key, cmap="hot",
+                interpolation="nearest",
+            )
+            if li_idx == 0:
+                ax_left.set_title(
+                    f"{label}\nSink-as-Key",
+                    fontsize=8, fontweight="bold",
+                )
+            else:
+                ax_left.set_title(f"L{layer_num}", fontsize=8)
+            ax_left.axis("off")
+
+            # ── Right: where sinks look (sink → visual) ──
+            ax_right = axes[li_idx, n_conds + ci]
+            if len(sink_abs) > 0:
+                spatial_q, _ = attn_to_spatial(
+                    attn_layer, s, e, grid_thw, sms,
+                    query_range=sink_abs.tolist(),
+                    head_mode="mean",
+                )
+                ax_right.imshow(
+                    spatial_q, cmap="hot",
+                    interpolation="nearest",
+                )
+            else:
+                ax_right.text(
+                    0.5, 0.5, "no sinks", ha="center",
+                    va="center", transform=ax_right.transAxes,
+                )
+            if li_idx == 0:
+                ax_right.set_title(
+                    f"{label}\nSink-as-Query",
+                    fontsize=8, fontweight="bold",
+                )
+            else:
+                ax_right.set_title(f"L{layer_num}", fontsize=8)
+            ax_right.axis("off")
+
+    fig.suptitle(
+        f"Bidirectional Attention Flow {sample_id}\n"
+        f"Left half: Who looks at sinks | "
+        f"Right half: Where sinks look",
+        fontsize=11,
+    )
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+
+
+def compute_attention_budget(
+    attn_layer, s, e, sink_abs, nonsink_abs,
+):
+    """
+    For sink queries, compute fraction of attention to each
+    token group: system, sinks, content, text.
+
+    Returns dict of {group: mean_fraction}.
+    """
+    if len(sink_abs) == 0:
+        return {}
+
+    n_heads = attn_layer.shape[0]
+    q_end = attn_layer.shape[1]
+
+    # Attention from sink queries, averaged over heads
+    # attn_layer: [n_heads, q_len, kv_len]
+    sink_attn = attn_layer[:, sink_abs, :]  # [H, n_sink, kv]
+    sink_attn_mean = sink_attn.mean(axis=(0, 1))  # [kv_len]
+
+    total = sink_attn_mean.sum() + 1e-12
+
+    system_range = list(range(0, s))
+    text_range = list(range(e, q_end))
+    sink_list = sink_abs.tolist()
+    content_list = nonsink_abs.tolist()
+
+    budget = {
+        "system": sink_attn_mean[system_range].sum() / total
+        if system_range else 0.0,
+        "sinks": sink_attn_mean[sink_list].sum() / total
+        if sink_list else 0.0,
+        "content": sink_attn_mean[content_list].sum() / total
+        if content_list else 0.0,
+        "text": sink_attn_mean[text_range].sum() / total
+        if text_range else 0.0,
+    }
+    return {k: float(v) for k, v in budget.items()}
+
+
+def generate_attention_budget_figure(
+    budget_data, output_path,
+):
+    """
+    Stacked bar chart: attention budget per layer per condition.
+
+    budget_data: list of dicts with keys:
+      layer, condition, system, sinks, content, text
+    """
+    import pandas as pd
+
+    df = pd.DataFrame(budget_data)
+    if df.empty:
+        return
+
+    layers = sorted(df["layer"].unique())
+    conditions = sorted(
+        df["condition"].unique(),
+        key=lambda c: df[df["condition"] == c].index[0],
+    )
+    groups = ["system", "sinks", "content", "text"]
+    colors = ["#9E9E9E", "#F44336", "#4CAF50", "#2196F3"]
+
+    n_layers = len(layers)
+    fig, axes = plt.subplots(
+        1, n_layers, figsize=(4 * n_layers, 5),
+        sharey=True,
+    )
+    if n_layers == 1:
+        axes = [axes]
+
+    for ax, layer_num in zip(axes, layers):
+        sub = df[df["layer"] == layer_num]
+        x = np.arange(len(conditions))
+        bottom = np.zeros(len(conditions))
+
+        for gi, (group, color) in enumerate(
+            zip(groups, colors)
+        ):
+            vals = []
+            for cond in conditions:
+                row = sub[sub["condition"] == cond]
+                if len(row) > 0:
+                    vals.append(
+                        row[group].values.mean()
+                    )
+                else:
+                    vals.append(0)
+            vals = np.array(vals)
+            ax.bar(
+                x, vals, bottom=bottom, width=0.6,
+                color=color, label=group if ax == axes[0]
+                else None,
+            )
+            bottom += vals
+
+        ax.set_xticks(x)
+        ax.set_xticklabels(
+            conditions, rotation=45, ha="right", fontsize=7,
+        )
+        ax.set_title(f"Layer {layer_num}", fontsize=10)
+        ax.set_ylim(0, 1.05)
+
+    axes[0].set_ylabel("Fraction of sink attention")
+    axes[0].legend(
+        loc="upper left", fontsize=8,
+        title="Token group",
+    )
+    fig.suptitle(
+        "Attention Budget: Where Do Sinks Spend Their Attention?",
+        fontsize=12,
+    )
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+    print("  Saved attention budget figure")
 
 
 # ── phi scatter plot ─────────────────────────────────
@@ -720,6 +940,7 @@ def main():
         "PM-all": [0, 0, 0, 0],
     }  # [sink_stayed, sink_lost, nonsink_stayed, nonsink_became]
     heatmap_count = 0
+    budget_data = []  # For aggregate attention budget
     dims_discovered = False
 
     for bname in args.benchmarks:
@@ -994,8 +1215,41 @@ def main():
                                 ),
                             )
 
+                    # Fig: Bidirectional attention flow
+                    generate_bidirectional_flow(
+                        attn_conds, s, e,
+                        grid_thw, sms, sink_local,
+                        heatmap_layers,
+                        os.path.join(
+                            args.output_dir, "heatmaps",
+                            f"bidir_flow_{bname}_{qi:03d}.png",
+                        ),
+                        sample_id=f"[{bname} Q{qi}]",
+                    )
+
                     heatmap_count += 1
                     print(f"    Heatmaps saved for Q{qi}")
+
+                # ── Collect attention budget ───────────
+                nonsink_abs = nonsink_local + s
+                for layer_num in heatmap_layers:
+                    for cond_label, attn_list in [
+                        ("BL", attn_bl),
+                        ("PM-sink", attn_pms),
+                        ("PM-noise", attn_pmn),
+                        ("PM-shuffle", attn_pmsh),
+                        ("PM-all", attn_pma),
+                        ("SM-sink", attn_sm),
+                    ]:
+                        if layer_num < len(attn_list):
+                            b = compute_attention_budget(
+                                attn_list[layer_num],
+                                s, e, sink_abs, nonsink_abs,
+                            )
+                            if b:
+                                b["layer"] = layer_num
+                                b["condition"] = cond_label
+                                budget_data.append(b)
 
                 elapsed = time.time() - t0
                 lg.log(
@@ -1039,6 +1293,15 @@ def main():
               f"create={create:.1%}")
 
     generate_persistence_bar(persist_rates, args.output_dir)
+
+    # Attention budget
+    if budget_data:
+        generate_attention_budget_figure(
+            budget_data,
+            os.path.join(
+                args.output_dir, "fig_attention_budget.png",
+            ),
+        )
 
     lg.log("exp_end")
     lg.close()
